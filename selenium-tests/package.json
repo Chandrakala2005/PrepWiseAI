@@ -1,0 +1,30 @@
+{
+  "name": "prepwise-ai-selenium-tests",
+  "version": "1.0.0",
+  "description": "Selenium WebDriver E2E Testing Framework for PrepWiseAI Web Application",
+  "main": "tests/login-tests.js",
+  "scripts": {
+    "test": "mocha tests/**/*.js --timeout 60000",
+    "test:login": "mocha tests/login-tests.js --timeout 60000",
+    "generate-excel": "node scripts/generate_excel.js"
+  },
+  "keywords": [
+    "selenium",
+    "webdriver",
+    "e2e",
+    "testing",
+    "prepwise-ai",
+    "react"
+  ],
+  "author": "PrepWiseAI QA Engineering Team",
+  "license": "ISC",
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "selenium-webdriver": "^4.27.0"
+  },
+  "devDependencies": {
+    "chai": "^4.5.0",
+    "mocha": "^10.8.0",
+    "chromedriver": "^131.0.0"
+  }
+}

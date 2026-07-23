@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">PrepWiseAI</string>
+    <string name="title_activity_main">PrepWiseAI</string>
+    <string name="package_name">com.prepwise.ai</string>
+    <string name="custom_url_scheme">com.prepwise.ai</string>
+</resources>
