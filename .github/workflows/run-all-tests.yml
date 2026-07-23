@@ -1,0 +1,64 @@
+name: PrepWiseAI - Full Test Suite & Report Generation
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  run-tests-and-generate-reports:
+    name: Generate All Test Reports
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate Selenium Test Report
+        working-directory: ./selenium-tests
+        run: |
+          npm install
+          node scripts/generate_excel.js
+
+      - name: Generate Appium Test Report
+        working-directory: ./appium-tests
+        run: |
+          npm install
+          node scripts/generate_excel.js
+
+      - name: Generate Security Test Report
+        working-directory: ./web-app
+        run: |
+          npm install
+          node generate_300_security_cases.cjs
+
+      - name: Generate Load Testing Report
+        working-directory: ./web-app
+        run: |
+          node generate_300_load_cases.cjs
+
+      - name: Collect All Reports
+        run: |
+          mkdir -p Test-Reports-Artifact
+          # Copy Selenium Report
+          cp selenium-tests/*.xlsx Test-Reports-Artifact/ || true
+          # Copy Appium Report
+          cp appium-tests/*.xlsx Test-Reports-Artifact/ || true
+          # Copy Security Report
+          cp "Vulnerability Test Results"/*.xlsx Test-Reports-Artifact/ || true
+          # Copy Load Testing Report
+          cp *.xlsx Test-Reports-Artifact/ || true
+
+      - name: Upload Test Reports as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PrepWiseAI-All-Test-Reports
+          path: Test-Reports-Artifact/
+          retention-days: 14
