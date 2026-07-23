@@ -1,0 +1,10 @@
+providers = ["node"]
+
+[phases.setup]
+nixPkgs = ["nodejs"]
+
+[phases.build]
+cmds = ["cd web-app && npm install"]
+
+[start]
+cmd = "cd web-app && npm run start"
