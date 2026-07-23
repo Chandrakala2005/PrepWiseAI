@@ -102,23 +102,44 @@ export default function LiveInterviewView({ sessionConfig, onEndSession }) {
       setShowHint(false);
     } else {
       // Calculate dynamic score based on answers
-      let totalLength = 0;
-      let usedKeywords = 0;
+      let calculatedScore = 0;
+      let totalExpectedKeywords = 0;
+      let matchedKeywords = 0;
       
-      newAnswers.forEach(ans => {
+      newAnswers.forEach((ans, idx) => {
         const cleanAns = ans.toLowerCase();
-        totalLength += cleanAns.length;
-        if (cleanAns.includes('hash') || cleanAns.includes('array') || cleanAns.includes('pointer')) usedKeywords++;
-        if (cleanAns.includes('tree') || cleanAns.includes('O(1)') || cleanAns.includes('cache')) usedKeywords++;
-        if (cleanAns.length > 50) usedKeywords++; // bonus for longer answers
+        
+        // Use generic tech keywords if specific ones aren't defined in mock data
+        const techKeywords = ['api', 'database', 'cache', 'index', 'hash', 'array', 'tree', 'o(1)', 'o(n)', 'pointer', 'microservice', 'load balancer', 'state', 'component', 'react', 'node', 'sql', 'nosql', 'design', 'architecture', 'scale', 'latency', 'throughput', 'memory', 'cpu'];
+        
+        // Count how many keywords the user actually mentioned
+        let usedKeywords = new Set();
+        techKeywords.forEach(kw => {
+          if (cleanAns.includes(kw)) {
+            usedKeywords.add(kw);
+          }
+        });
+        
+        // We expect at least 3 technical keywords per answer for a perfect score
+        totalExpectedKeywords += 3;
+        matchedKeywords += Math.min(3, usedKeywords.size);
+        
+        // Bonus for detailed explanations (length)
+        if (cleanAns.length > 100) matchedKeywords += 0.5;
+        if (cleanAns.length > 200) matchedKeywords += 0.5;
       });
 
-      // Base score 0 if empty, else 40 base + up to 60 based on effort
-      let calculatedScore = 0;
-      if (totalLength > 0) {
-        calculatedScore = 40 + Math.min(60, (totalLength / 10) + (usedKeywords * 5));
+      if (totalExpectedKeywords > 0) {
+        calculatedScore = Math.round((matchedKeywords / totalExpectedKeywords) * 100);
       }
-      calculatedScore = Math.round(calculatedScore);
+      
+      // Cap at 100
+      calculatedScore = Math.min(100, calculatedScore);
+      
+      // If practically empty, score is 0
+      if (newAnswers.join('').trim().length < 10) {
+        calculatedScore = 0;
+      }
 
       onEndSession({
         score: calculatedScore,

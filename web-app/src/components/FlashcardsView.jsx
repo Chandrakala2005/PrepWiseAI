@@ -39,23 +39,25 @@ export default function FlashcardsView() {
         style={{ height: '340px', width: '100%', cursor: 'pointer' }}
         onClick={() => setIsFlipped(!isFlipped)}
       >
-        <div className={`flip-card-inner glass-panel ${isFlipped ? 'flipped' : ''}`} style={{
+        <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`} style={{
           width: '100%',
           height: '100%',
-          position: 'relative',
-          borderRadius: 'var(--radius-lg)',
-          border: '1px solid rgba(99, 102, 241, 0.3)',
-          background: 'linear-gradient(135deg, rgba(18, 26, 44, 0.95) 0%, rgba(26, 37, 62, 0.95) 100%)'
+          position: 'relative'
         }}>
           {/* Card Front (Question) */}
-          <div className="flip-card-front" style={{
+          <div className="flip-card-front glass-panel" style={{
             position: 'absolute',
             width: '100%',
             height: '100%',
             padding: '36px',
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden',
+            borderRadius: 'var(--radius-lg)',
+            border: '1px solid rgba(99, 102, 241, 0.3)',
+            background: 'linear-gradient(135deg, rgba(18, 26, 44, 0.95) 0%, rgba(26, 37, 62, 0.95) 100%)'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{
@@ -83,7 +85,7 @@ export default function FlashcardsView() {
           </div>
 
           {/* Card Back (Answer) */}
-          <div className="flip-card-back" style={{
+          <div className="flip-card-back glass-panel" style={{
             position: 'absolute',
             width: '100%',
             height: '100%',
@@ -91,7 +93,12 @@ export default function FlashcardsView() {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            background: 'linear-gradient(135deg, rgba(20, 184, 166, 0.15) 0%, rgba(18, 26, 44, 0.95) 100%)'
+            background: 'linear-gradient(135deg, rgba(20, 184, 166, 0.15) 0%, rgba(18, 26, 44, 0.95) 100%)',
+            transform: 'rotateY(180deg)',
+            backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden',
+            borderRadius: 'var(--radius-lg)',
+            border: '1px solid rgba(99, 102, 241, 0.3)'
           }}>
             <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--accent-teal)' }}>
               MODEL EXPLANATION / ANSWER

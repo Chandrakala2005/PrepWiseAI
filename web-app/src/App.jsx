@@ -19,6 +19,15 @@ export default function App() {
   const [lastSessionResult, setLastSessionResult] = useState(null);
 
   const [isInitializing, setIsInitializing] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(true);
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.body.classList.remove('light-theme');
+    } else {
+      document.body.classList.add('light-theme');
+    }
+  }, [isDarkMode]);
   
   useEffect(() => {
     // Attempt to auto-login if token exists
@@ -105,6 +114,8 @@ export default function App() {
         onStartInterview={handleStartInterview}
         user={user}
         onLogout={handleLogout}
+        isDarkMode={isDarkMode}
+        toggleTheme={() => setIsDarkMode(!isDarkMode)}
       />
 
       {/* Main Layout Body */}

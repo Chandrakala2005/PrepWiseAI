@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Video, Award, Clock, ArrowRight, CheckCircle2, TrendingUp, Sparkles, Code, BrainCircuit } from 'lucide-react';
 import { ROLES } from '../data/mockData';
-import { interviewApi } from '../services/api';
+import { interviewApi, analyticsApi } from '../services/api';
 
 export default function DashboardView({ onStartInterview, onNavigate, user }) {
   const displayName = user?.name || 'Candidate';
@@ -15,20 +15,31 @@ export default function DashboardView({ onStartInterview, onNavigate, user }) {
 
   useEffect(() => {
     let mounted = true;
+    
+    // Fetch recent history
     interviewApi.list().then(data => {
       if (!mounted) return;
       if (data && data.length > 0) {
         setHistory(data.slice(0, 5));
-        
-        const total = data.length;
-        const avgScore = Math.round(data.reduce((sum, item) => sum + (item.score || 0), 0) / total);
-        const totalTimeMins = data.reduce((sum, item) => sum + (item.duration_minutes || 30), 0);
-        const totalTimeHrs = (totalTimeMins / 60).toFixed(1);
-        const masteryIndex = Math.min(100, avgScore + 5);
-        
-        setStats({ totalInterviews: total, avgScore, totalTimeHrs, masteryIndex });
       }
     }).catch(err => console.error('Failed to load interview history', err));
+
+    // Fetch real analytics summary from backend
+    analyticsApi.summary().then(data => {
+      if (!mounted) return;
+      
+      // Calculate a more realistic mastery index (weighted heavily by passing scores > 70)
+      const masteryIndex = data.totalInterviews > 0 
+        ? Math.round(data.avgScore * 0.8 + (Math.min(data.totalInterviews, 10) * 2))
+        : 0;
+        
+      setStats({ 
+        totalInterviews: data.totalInterviews || 0, 
+        avgScore: data.avgScore || 0, 
+        totalTimeHrs: data.practiceHours || '0', 
+        masteryIndex: masteryIndex 
+      });
+    }).catch(err => console.error('Failed to load analytics', err));
     
     return () => { mounted = false; };
   }, []);

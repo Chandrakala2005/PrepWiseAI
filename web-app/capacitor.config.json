@@ -1,5 +1,8 @@
 {
   "appId": "com.prepwise.ai",
   "appName": "PrepWiseAI",
-  "webDir": "dist"
+  "webDir": "dist",
+  "server": {
+    "cleartext": true
+  }
 }

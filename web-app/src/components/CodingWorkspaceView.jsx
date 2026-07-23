@@ -18,16 +18,35 @@ export default function CodingWorkspaceView() {
     setIsRunning(true);
     setTimeout(() => {
       setIsRunning(false);
-      setTestResults({
-        passed: 2,
-        total: 2,
-        runtime: '48 ms',
-        memory: '16.4 MB',
-        details: [
-          { testCase: 1, status: 'PASSED', input: 'root = [2,1,3]', expected: 'true', actual: 'true' },
-          { testCase: 2, status: 'PASSED', input: 'root = [5,1,4,null,null,3,6]', expected: 'false', actual: 'false' }
-        ]
-      });
+      
+      // Basic static analysis to check if they actually wrote code
+      const cleanCode = code.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '').trim().toLowerCase();
+      const hasLogic = cleanCode.length > 20 && (cleanCode.includes('return') || cleanCode.includes('print'));
+      const hasBadKeywords = cleanCode.includes('todo') || cleanCode === 'pass';
+      
+      if (!hasLogic || hasBadKeywords) {
+        setTestResults({
+          passed: 0,
+          total: 2,
+          runtime: 'N/A',
+          memory: 'N/A',
+          details: [
+            { testCase: 1, status: 'FAILED', input: 'root = [2,1,3]', expected: 'true', actual: 'null / error' },
+            { testCase: 2, status: 'FAILED', input: 'root = [5,1,4,null,null,3,6]', expected: 'false', actual: 'null / error' }
+          ]
+        });
+      } else {
+        setTestResults({
+          passed: 2,
+          total: 2,
+          runtime: '48 ms',
+          memory: '16.4 MB',
+          details: [
+            { testCase: 1, status: 'PASSED', input: 'root = [2,1,3]', expected: 'true', actual: 'true' },
+            { testCase: 2, status: 'PASSED', input: 'root = [5,1,4,null,null,3,6]', expected: 'false', actual: 'false' }
+          ]
+        });
+      }
     }, 1200);
   };
 
@@ -153,8 +172,13 @@ export default function CodingWorkspaceView() {
         {/* Console Output */}
         {testResults && (
           <div className="glass-panel" style={{ padding: '16px', maxHeight: '180px', overflowY: 'auto' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', color: 'var(--accent-emerald)', fontWeight: '700', fontSize: '14px' }}>
-              <CheckCircle2 size={16} /> All Test Cases Passed ({testResults.passed}/{testResults.total}) — Runtime: {testResults.runtime}
+            <div style={{ 
+              display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', 
+              color: testResults.passed === testResults.total ? 'var(--accent-emerald)' : '#EF4444', 
+              fontWeight: '700', fontSize: '14px' 
+            }}>
+              {testResults.passed === testResults.total ? <CheckCircle2 size={16} /> : <XCircle size={16} />} 
+              {testResults.passed === testResults.total ? 'All Test Cases Passed' : 'Test Cases Failed'} ({testResults.passed}/{testResults.total}) — Runtime: {testResults.runtime}
             </div>
 
             {testResults.details.map((res, i) => (

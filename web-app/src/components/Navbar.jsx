@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Flame, Search, Sparkles, LogOut, ChevronDown, Mail, Award, Clock, TrendingUp, Settings, HelpCircle, Moon, Bell } from 'lucide-react';
+import { analyticsApi } from '../services/api';
 
-export default function Navbar({ streakCount = 7, onStartInterview, user, onLogout }) {
+export default function Navbar({ streakCount = 7, onStartInterview, user, onLogout, isDarkMode, toggleTheme }) {
   const initials = user?.name ? user.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) : 'CK';
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [profileStats, setProfileStats] = useState({ interviews: 0, avgScore: 0, practiceHrs: 0 });
   const dropdownRef = useRef(null);
   const notifRef = useRef(null);
 
@@ -19,6 +21,22 @@ export default function Navbar({ streakCount = 7, onStartInterview, user, onLogo
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Fetch real user stats for profile dropdown
+  useEffect(() => {
+    let mounted = true;
+    analyticsApi.summary().then(data => {
+      if (!mounted) return;
+      if (data) {
+        setProfileStats({ 
+          interviews: data.totalInterviews || 0, 
+          avgScore: data.avgScore || 0, 
+          practiceHrs: data.practiceHours || '0' 
+        });
+      }
+    }).catch(err => console.error('Failed to load profile stats', err));
+    return () => { mounted = false; };
   }, []);
 
   return (
@@ -229,9 +247,9 @@ export default function Navbar({ streakCount = 7, onStartInterview, user, onLogo
               {/* Quick Stats Row */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', borderBottom: '1px solid var(--border-glass)' }}>
                 {[
-                  { label: 'Interviews', value: '18', icon: Award, color: '#6366F1' },
-                  { label: 'Avg Score', value: '87%', icon: TrendingUp, color: '#14B8A6' },
-                  { label: 'Practice', value: '14.5h', icon: Clock, color: '#F59E0B' }
+                  { label: 'Interviews', value: profileStats.interviews.toString(), icon: Award, color: '#6366F1' },
+                  { label: 'Avg Score', value: `${profileStats.avgScore}%`, icon: TrendingUp, color: '#14B8A6' },
+                  { label: 'Practice', value: `${profileStats.practiceHrs}h`, icon: Clock, color: '#F59E0B' }
                 ].map((stat, i) => {
                   const Icon = stat.icon;
                   return (
@@ -252,13 +270,14 @@ export default function Navbar({ streakCount = 7, onStartInterview, user, onLogo
                 {[
                   { label: 'Account Settings', icon: Settings },
                   { label: 'Notification Preferences', icon: Bell },
-                  { label: 'Dark Mode', icon: Moon, trailing: 'On' },
+                  { label: 'Dark Mode', icon: Moon, trailing: isDarkMode ? 'On' : 'Off', onClick: toggleTheme },
                   { label: 'Help & Support', icon: HelpCircle }
                 ].map((item, i) => {
                   const Icon = item.icon;
                   return (
                     <button
                       key={i}
+                      onClick={item.onClick}
                       style={{
                         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                         width: '100%', padding: '10px 14px', borderRadius: 'var(--radius-sm)',
