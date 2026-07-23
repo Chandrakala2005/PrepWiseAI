@@ -89,7 +89,7 @@ async function generateLoadTestCases() {
   }
 
   // SAVE
-  const outputPath = path.join(__dirname, '..', 'PrepWiseAI_Load_Testing_300_Test_Cases_Passed.xlsx');
+  const outputPath = path.join(__dirname, '..', 'PrepWiseAI_Load_Testing_300_Test_Cases.xlsx');
   try {
     await workbook.xlsx.writeFile(outputPath);
     console.log(`\n✅ Generated 300 Load Test Cases at: ${outputPath}`);

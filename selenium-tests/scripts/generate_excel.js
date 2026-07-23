@@ -626,7 +626,7 @@ async function generateTestCasesExcel() {
   // ===========================
   // SAVE
   // ===========================
-  const outputPath = path.join(__dirname, '..', 'PrepWiseAI_Selenium_Test_Cases_Passed.xlsx');
+  const outputPath = path.join(__dirname, '..', 'PrepWiseAI_Selenium_Test_Cases.xlsx');
   try {
     await workbook.xlsx.writeFile(outputPath);
     console.log(`\n✅ Excel report generated: ${outputPath}`);

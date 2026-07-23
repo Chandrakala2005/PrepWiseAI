@@ -90,7 +90,7 @@ async function generateSecurityTestCases() {
   }
 
   // SAVE
-  const outputPath = path.join(__dirname, '..', 'Vulnerability Test Results', 'PrepWiseAI_Security_300_Test_Cases_Passed.xlsx');
+  const outputPath = path.join(__dirname, '..', 'Vulnerability Test Results', 'PrepWiseAI_Security_300_Test_Cases.xlsx');
   try {
     await workbook.xlsx.writeFile(outputPath);
     console.log(`\n✅ Generated 300 Security Test Cases at: ${outputPath}`);
