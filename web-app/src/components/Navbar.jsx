@@ -48,7 +48,7 @@ export default function Navbar({ streakCount = 7, onStartInterview, user, onLogo
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      padding: '0 28px',
+      padding: '0 16px',
       position: 'sticky',
       top: 0,
       zIndex: 50
@@ -67,14 +67,14 @@ export default function Navbar({ streakCount = 7, onStartInterview, user, onLogo
           <span style={{ fontSize: '20px', fontWeight: '800', letterSpacing: '-0.5px' }}>
             PrepWise<span className="gradient-text">AI</span>
           </span>
-          <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: '600', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+          <div className="hide-mobile" style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: '600', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
             AI Interview Suite
           </div>
         </div>
       </div>
 
       {/* Center Search Bar */}
-      <div style={{ position: 'relative', width: '380px', display: 'flex', alignItems: 'center' }}>
+      <div className="hide-mobile" style={{ position: 'relative', width: '380px', display: 'flex', alignItems: 'center' }}>
         <Search size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '14px' }} />
         <input
           type="text"
@@ -88,9 +88,9 @@ export default function Navbar({ streakCount = 7, onStartInterview, user, onLogo
       </div>
 
       {/* Right Controls */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         {/* Streak Badge */}
-        <div style={{
+        <div className="hide-mobile" style={{
           display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 14px',
           borderRadius: 'var(--radius-full)', background: 'rgba(245, 158, 11, 0.12)',
           border: '1px solid rgba(245, 158, 11, 0.3)', color: 'var(--accent-amber)',
@@ -102,6 +102,7 @@ export default function Navbar({ streakCount = 7, onStartInterview, user, onLogo
 
         {/* Quick Launch CTA */}
         <button
+          className="hide-mobile"
           onClick={onStartInterview}
           style={{
             display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 18px',
@@ -111,7 +112,7 @@ export default function Navbar({ streakCount = 7, onStartInterview, user, onLogo
           }}
         >
           <Sparkles size={16} />
-          Start AI Mock Interview
+          <span>Start AI Mock Interview</span>
         </button>
 
         {/* Notification Bell */}
@@ -185,7 +186,7 @@ export default function Navbar({ streakCount = 7, onStartInterview, user, onLogo
             }}>
               {initials}
             </div>
-            <div style={{ lineHeight: 1.3 }}>
+            <div className="hide-mobile" style={{ lineHeight: 1.3 }}>
               <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-main)' }}>
                 {user?.name || 'Candidate'}
               </div>

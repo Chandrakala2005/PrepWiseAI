@@ -12,21 +12,9 @@ export default function Sidebar({ activeTab, setActiveTab }) {
   ];
 
   return (
-    <aside style={{
-      width: '250px',
-      borderRight: '1px solid var(--border-glass)',
-      background: 'rgba(10, 15, 29, 0.6)',
-      backdropFilter: 'blur(16px)',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-      padding: '24px 16px',
-      height: 'calc(100vh - 72px)',
-      position: 'sticky',
-      top: '72px'
-    }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        <div style={{
+    <aside className="sidebar-container">
+      <div className="sidebar-menu-items">
+        <div className="sidebar-nav-title" style={{
           fontSize: '11px',
           fontWeight: '700',
           color: 'var(--text-dim)',
@@ -43,20 +31,13 @@ export default function Sidebar({ activeTab, setActiveTab }) {
           return (
             <button
               key={item.id}
+              className="sidebar-item-btn"
               onClick={() => setActiveTab(item.id)}
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '12px 14px',
-                borderRadius: 'var(--radius-md)',
                 background: isActive ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(139, 92, 246, 0.15) 100%)' : 'transparent',
-                border: isActive ? '1px solid var(--border-glow)' : '1px solid transparent',
+                borderColor: isActive ? 'var(--border-glow)' : 'transparent',
                 color: isActive ? '#FFF' : 'var(--text-muted)',
-                fontWeight: isActive ? '700' : '500',
-                fontSize: '14px',
-                cursor: 'pointer',
-                transition: 'var(--transition-fast)'
+                fontWeight: isActive ? '700' : '500'
               }}
               onMouseOver={(e) => {
                 if (!isActive) e.currentTarget.style.background = 'var(--bg-glass)';
@@ -67,11 +48,11 @@ export default function Sidebar({ activeTab, setActiveTab }) {
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <Icon size={18} color={isActive ? 'var(--primary)' : 'currentColor'} />
-                <span>{item.label}</span>
+                <span className="sidebar-item-label">{item.label}</span>
               </div>
 
               {item.badge && (
-                <span style={{
+                <span className="sidebar-badge" style={{
                   fontSize: '10px',
                   fontWeight: '800',
                   padding: '2px 8px',
@@ -88,7 +69,7 @@ export default function Sidebar({ activeTab, setActiveTab }) {
       </div>
 
       {/* Bottom Preferences / Settings */}
-      <div style={{
+      <div className="sidebar-bottom-prefs" style={{
         paddingTop: '16px',
         borderTop: '1px solid var(--border-glass)'
       }}>

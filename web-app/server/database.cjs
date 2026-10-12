@@ -8,13 +8,28 @@ const path = require('path');
 const initSqlJs = require('sql.js');
 const bcrypt = require('bcryptjs');
 
-const DB_PATH = path.join(__dirname, 'prepwise.sqlite');
+const isVercel = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const BUNDLED_DB_PATH = path.join(__dirname, 'prepwise.sqlite');
+const DB_PATH = isVercel ? path.join('/tmp', 'prepwise.sqlite') : BUNDLED_DB_PATH;
 
 let dbInstance = null;
 
 async function initDatabase() {
+  if (dbInstance) {
+    return dbInstance;
+  }
+
   const SQL = await initSqlJs();
   let db;
+
+  // In Vercel serverless, copy pre-seeded SQLite file to writable /tmp directory if needed
+  if (isVercel && !fs.existsSync(DB_PATH) && fs.existsSync(BUNDLED_DB_PATH)) {
+    try {
+      fs.copyFileSync(BUNDLED_DB_PATH, DB_PATH);
+    } catch (err) {
+      console.warn('Could not copy bundled DB to /tmp:', err.message);
+    }
+  }
 
   if (fs.existsSync(DB_PATH)) {
     const filebuffer = fs.readFileSync(DB_PATH);
@@ -26,16 +41,24 @@ async function initDatabase() {
   // Helper to run query and save to file immediately
   db.runAndSave = function(sql, params = []) {
       this.run(sql, params);
-      const data = this.export();
-      const buffer = Buffer.from(data);
-      fs.writeFileSync(DB_PATH, buffer);
+      try {
+        const data = this.export();
+        const buffer = Buffer.from(data);
+        fs.writeFileSync(DB_PATH, buffer);
+      } catch (err) {
+        console.warn('DB file write warning:', err.message);
+      }
   };
   
   db.execAndSave = function(sql) {
       this.exec(sql);
-      const data = this.export();
-      const buffer = Buffer.from(data);
-      fs.writeFileSync(DB_PATH, buffer);
+      try {
+        const data = this.export();
+        const buffer = Buffer.from(data);
+        fs.writeFileSync(DB_PATH, buffer);
+      } catch (err) {
+        console.warn('DB file write warning:', err.message);
+      }
   };
 
 
@@ -142,9 +165,13 @@ async function initDatabase() {
     }
     
     // final save after seeding
-    const data = db.export();
-    const buffer = Buffer.from(data);
-    fs.writeFileSync(DB_PATH, buffer);
+    try {
+      const data = db.export();
+      const buffer = Buffer.from(data);
+      fs.writeFileSync(DB_PATH, buffer);
+    } catch (err) {
+      console.warn('DB seed write warning:', err.message);
+    }
 
     console.log('✅ Database seeded with demo users and interview history');
   }

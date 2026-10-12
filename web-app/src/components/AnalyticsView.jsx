@@ -45,6 +45,8 @@ export default function AnalyticsView({ onStartNewInterview, sessionResult }) {
         background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(99, 102, 241, 0.12) 100%)',
         border: '1px solid rgba(16, 185, 129, 0.3)',
         display: 'flex',
+        flexWrap: 'wrap',
+        gap: '20px',
         justifyContent: 'space-between',
         alignItems: 'center'
       }}>
@@ -69,7 +71,7 @@ export default function AnalyticsView({ onStartNewInterview, sessionResult }) {
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
           <button style={{
             display: 'flex',
             alignItems: 'center',
@@ -107,7 +109,7 @@ export default function AnalyticsView({ onStartNewInterview, sessionResult }) {
       </div>
 
       {/* Main Score Breakdown Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '24px' }}>
+      <div className="dashboard-split-reverse">
         {/* Overall Gauge */}
         <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
           <div style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: '700', marginBottom: '16px' }}>

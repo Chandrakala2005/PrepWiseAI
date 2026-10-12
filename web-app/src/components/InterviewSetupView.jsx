@@ -33,7 +33,7 @@ export default function InterviewSetupView({ onLaunchLiveSession }) {
           <Cpu size={18} color="var(--primary)" /> Step 1: Target Role & Domain
         </h3>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px' }}>
+        <div className="responsive-grid-3">
           {ROLES.map((role) => {
             const isSelected = selectedRole.id === role.id;
             return (
@@ -66,7 +66,7 @@ export default function InterviewSetupView({ onLaunchLiveSession }) {
           <UserCheck size={18} color="var(--accent-teal)" /> Step 2: Choose AI Interviewer Persona
         </h3>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+        <div className="responsive-grid-3">
           {AI_PERSONAS.map((persona) => {
             const isSelected = selectedPersona.id === persona.id;
             return (
@@ -114,13 +114,13 @@ export default function InterviewSetupView({ onLaunchLiveSession }) {
       </div>
 
       {/* Step 3: Difficulty & Duration */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px' }}>
+      <div className="dashboard-split">
         <div className="glass-panel" style={{ padding: '24px' }}>
           <h3 style={{ fontSize: '16px', fontWeight: '700', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <ShieldCheck size={18} color="var(--accent-pink)" /> Step 3: Technical Difficulty
           </h3>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
+          <div className="responsive-grid-2">
             {difficulties.map((diff) => (
               <button
                 key={diff.level}

@@ -119,12 +119,12 @@ export default function App() {
       />
 
       {/* Main Layout Body */}
-      <div style={{ display: 'flex', flex: 1 }}>
+      <div className="app-container">
         {/* Sidebar Navigation */}
         <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
         {/* View Content Area */}
-        <main style={{ flex: 1, padding: '32px 36px', overflowY: 'auto' }}>
+        <main className="main-content">
           {activeTab === 'dashboard' && (
             <DashboardView
               onStartInterview={handleStartInterview}

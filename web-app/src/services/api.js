@@ -6,7 +6,16 @@
 
 import { Capacitor } from '@capacitor/core';
 
-const API_BASE_URL = Capacitor.isNativePlatform() ? 'http://10.0.2.2:3001/api' : '/api';
+// Dynamic Base URL:
+// - Uses VITE_API_URL if configured in environment variables
+// - For native Capacitor mobile apps: uses Vercel production domain
+// - For web (Vercel deployment & Vite dev proxy): uses relative '/api'
+const PRODUCTION_VERCEL_URL = 'https://prep-wise-ai-mocha.vercel.app/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || (
+  Capacitor.isNativePlatform() 
+    ? PRODUCTION_VERCEL_URL 
+    : '/api'
+);
 
 // Helper to get auth headers
 const getAuthHeaders = () => {

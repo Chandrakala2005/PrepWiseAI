@@ -74,7 +74,7 @@ export default function DashboardView({ onStartInterview, onNavigate, user }) {
             Welcome back, <span className="gradient-text">{displayName}</span> 👋
           </h1>
           {user?.email && (
-            <div style={{ fontSize: '13px', color: 'var(--text-dim)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ fontSize: '13px', color: 'var(--text-dim)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
               Signed in as <span style={{ color: 'var(--accent-teal)', fontWeight: '600' }}>{user.email}</span>
               {user?.role && <span style={{ padding: '2px 8px', borderRadius: 'var(--radius-full)', background: 'rgba(139, 92, 246, 0.15)', color: '#C084FC', fontSize: '11px', fontWeight: '700' }}>{user.role}</span>}
               {user?.authMethod && <span style={{ padding: '2px 8px', borderRadius: 'var(--radius-full)', background: 'rgba(20, 184, 166, 0.12)', color: 'var(--accent-teal)', fontSize: '11px', fontWeight: '600' }}>via {user.authMethod}</span>}
@@ -84,8 +84,9 @@ export default function DashboardView({ onStartInterview, onNavigate, user }) {
             Simulate real-time voice & coding interviews with AI hiring personas tailored to FAANG, top tech startups, and enterprise roles.
           </p>
 
-          <div style={{ display: 'flex', gap: '14px' }}>
+          <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
             <button
+              className="dashboard-hero-btn"
               onClick={onStartInterview}
               style={{
                 display: 'flex',
@@ -109,6 +110,7 @@ export default function DashboardView({ onStartInterview, onNavigate, user }) {
             </button>
 
             <button
+              className="dashboard-hero-btn"
               onClick={() => onNavigate('coding')}
               style={{
                 display: 'flex',
@@ -132,7 +134,7 @@ export default function DashboardView({ onStartInterview, onNavigate, user }) {
       </div>
 
       {/* KPI Stats Cards Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
+      <div className="stats-grid">
         {[
           { label: 'Mock Interviews Done', value: stats.totalInterviews.toString(), sub: stats.totalInterviews > 0 ? 'Great job!' : 'Start your first today!', icon: Video, color: '#6366F1' },
           { label: 'Average Score', value: `${stats.avgScore}%`, sub: stats.totalInterviews > 0 ? 'Overall performance' : 'Not enough data', icon: Award, color: '#14B8A6' },
@@ -160,7 +162,7 @@ export default function DashboardView({ onStartInterview, onNavigate, user }) {
       </div>
 
       {/* Recommended Role Track & Recent Score Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
+      <div className="dashboard-split">
         {/* Recommended Tracks */}
         <div className="glass-panel" style={{ padding: '24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
@@ -168,7 +170,7 @@ export default function DashboardView({ onStartInterview, onNavigate, user }) {
             <span style={{ fontSize: '13px', color: 'var(--primary)', fontWeight: '600', cursor: 'pointer' }}>View All</span>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
+          <div className="tracks-grid">
             {ROLES.slice(0, 4).map((role) => (
               <div
                 key={role.id}

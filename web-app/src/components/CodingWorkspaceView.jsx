@@ -51,7 +51,7 @@ export default function CodingWorkspaceView() {
   };
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', height: 'calc(100vh - 120px)' }}>
+    <div className="responsive-grid-2" style={{ minHeight: 'calc(100vh - 120px)' }}>
       {/* Left Column: Problem Description */}
       <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', overflowY: 'auto' }}>
         <div>
@@ -92,7 +92,9 @@ export default function CodingWorkspaceView() {
               border: '1px solid var(--border-glass)',
               marginBottom: '10px',
               fontSize: '13px',
-              fontFamily: 'var(--font-mono)'
+              fontFamily: 'var(--font-mono)',
+              wordBreak: 'break-word',
+              whiteSpace: 'pre-wrap'
             }}>
               <div><strong>Input:</strong> {tc.input}</div>
               <div><strong>Expected Output:</strong> {tc.expected}</div>
@@ -182,7 +184,7 @@ export default function CodingWorkspaceView() {
             </div>
 
             {testResults.details.map((res, i) => (
-              <div key={i} style={{ fontSize: '12px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', marginBottom: '4px' }}>
+              <div key={i} style={{ fontSize: '12px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', marginBottom: '4px', wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>
                 Testcase {res.testCase}: Input {res.input} ➔ Output {res.actual}
               </div>
             ))}
