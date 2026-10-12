@@ -26,6 +26,11 @@ function ensureDatabase() {
   return dbInitPromise;
 }
 
+// Health check endpoint (placed before db middleware so it responds immediately)
+app.get(['/api/health', '/health'], (req, res) => {
+  res.json({ status: 'ok', service: 'PrepWiseAI Backend (Vercel Serverless Ready)', time: new Date() });
+});
+
 app.use(async (req, res, next) => {
   try {
     await ensureDatabase();
@@ -47,15 +52,10 @@ app.use(['/api/interviews', '/interviews'], interviewRoutes);
 // Alias analytics to interviews for simplicity in this demo structure
 app.use(['/api/analytics', '/analytics'], interviewRoutes);
 
-// Health check endpoint
-app.get(['/api/health', '/health'], (req, res) => {
-  res.json({ status: 'ok', service: 'PrepWiseAI Backend (Vercel Serverless Ready)', time: new Date() });
-});
-
 // Global error handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong on the server!' });
+  console.error('Server error handler:', err);
+  res.status(500).json({ error: 'Server error', message: err.message || 'Something went wrong' });
 });
 
 // Start standalone server when executed directly (node server/server.cjs or npm run server)

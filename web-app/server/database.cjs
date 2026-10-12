@@ -19,7 +19,27 @@ async function initDatabase() {
     return dbInstance;
   }
 
-  const SQL = await initSqlJs();
+  let wasmBinary = null;
+  const localWasm = path.join(__dirname, 'sql-wasm.wasm');
+  if (fs.existsSync(localWasm)) {
+    try {
+      wasmBinary = fs.readFileSync(localWasm);
+    } catch (e) {
+      console.warn('Could not read local wasm:', e.message);
+    }
+  }
+  if (!wasmBinary) {
+    try {
+      const wasmPath = require.resolve('sql.js/dist/sql-wasm.wasm');
+      if (fs.existsSync(wasmPath)) {
+        wasmBinary = fs.readFileSync(wasmPath);
+      }
+    } catch (e) {
+      console.warn('Could not resolve wasm path:', e.message);
+    }
+  }
+
+  const SQL = await initSqlJs(wasmBinary ? { wasmBinary } : {});
   let db;
 
   // In Vercel serverless, copy pre-seeded SQLite file to writable /tmp directory if needed
