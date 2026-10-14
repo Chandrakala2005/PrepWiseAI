@@ -26,18 +26,39 @@ export default function Navbar({ streakCount = 7, onStartInterview, user, onLogo
   // Fetch real user stats for profile dropdown
   useEffect(() => {
     let mounted = true;
+    const userEmail = user?.email || 'default';
+    const storageKey = `prepwise_interviews_${userEmail}`;
+
+    try {
+      const saved = localStorage.getItem(storageKey);
+      if (saved) {
+        const list = JSON.parse(saved);
+        if (list && list.length > 0) {
+          const total = list.length;
+          const avg = Math.round(list.reduce((sum, i) => sum + (Number(i.score) || 0), 0) / total);
+          const totalMins = list.reduce((sum, i) => sum + (Number(i.duration_minutes) || 30), 0);
+          const hrs = (totalMins / 60).toFixed(1);
+          setProfileStats({
+            interviews: total,
+            avgScore: avg,
+            practiceHrs: hrs.endsWith('.0') ? hrs.slice(0, -2) : hrs
+          });
+        }
+      }
+    } catch (e) {}
+
     analyticsApi.summary().then(data => {
       if (!mounted) return;
       if (data) {
-        setProfileStats({ 
-          interviews: data.totalInterviews || 0, 
-          avgScore: data.avgScore || 0, 
-          practiceHrs: data.practiceHours || '0' 
-        });
+        setProfileStats(prev => ({ 
+          interviews: Math.max(prev.interviews, data.totalInterviews || 0), 
+          avgScore: prev.interviews > (data.totalInterviews || 0) ? prev.avgScore : (data.avgScore || 0), 
+          practiceHrs: prev.interviews > (data.totalInterviews || 0) ? prev.practiceHrs : (data.practiceHours || '0') 
+        }));
       }
     }).catch(err => console.error('Failed to load profile stats', err));
     return () => { mounted = false; };
-  }, []);
+  }, [user?.email]);
 
   return (
     <header style={{

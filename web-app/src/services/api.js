@@ -94,7 +94,8 @@ export const userApi = {
 
 export const interviewApi = {
   list: () => fetchApi('/interviews'),
-  save: (data) => fetchApi('/interviews', { method: 'POST', body: JSON.stringify(data) })
+  save: (data) => fetchApi('/interviews', { method: 'POST', body: JSON.stringify(data) }),
+  sync: (interviews) => fetchApi('/interviews/sync', { method: 'POST', body: JSON.stringify({ interviews }) })
 };
 
 export const analyticsApi = {

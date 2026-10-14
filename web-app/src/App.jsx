@@ -82,9 +82,22 @@ export default function App() {
           score: result.score,
           status: result.score >= 80 ? 'Passed' : 'Needs Work',
           topic: sessionConfig.role.name,
-          duration_minutes: sessionConfig.duration,
-          ai_persona: sessionConfig.persona.name
+          duration_minutes: sessionConfig.duration || 30,
+          ai_persona: sessionConfig.persona.name,
+          created_at: new Date().toISOString()
         };
+
+        // Instantly persist to local storage so count never decreases
+        const userEmail = user?.email || 'default';
+        const storageKey = `prepwise_interviews_${userEmail}`;
+        try {
+          const localList = JSON.parse(localStorage.getItem(storageKey) || '[]');
+          localList.unshift(interviewData);
+          localStorage.setItem(storageKey, JSON.stringify(localList));
+        } catch (e) {
+          console.warn('Local interview storage error:', e);
+        }
+
         const savedInterview = await interviewApi.save(interviewData);
         setLastSessionResult({ ...result, ...savedInterview, ...sessionConfig });
       }

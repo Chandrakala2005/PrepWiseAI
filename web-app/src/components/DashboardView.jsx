@@ -5,35 +5,126 @@ import { interviewApi, analyticsApi } from '../services/api';
 
 export default function DashboardView({ onStartInterview, onNavigate, user }) {
   const displayName = user?.name || 'Candidate';
-  const [history, setHistory] = useState([]);
-  const [stats, setStats] = useState({
-    totalInterviews: 0,
-    avgScore: 0,
-    totalTimeHrs: 0,
-    masteryIndex: 0
+  const userEmail = user?.email || 'default';
+  const storageKey = `prepwise_interviews_${userEmail}`;
+
+  // Helper to compute stats directly from interview history
+  const calculateStats = (items) => {
+    if (!items || items.length === 0) {
+      return { totalInterviews: 0, avgScore: 0, totalTimeHrs: '0', masteryIndex: 0 };
+    }
+    const totalInterviews = items.length;
+    const totalScore = items.reduce((sum, item) => sum + (Number(item.score) || 0), 0);
+    const avgScore = Math.round(totalScore / totalInterviews);
+    const totalMinutes = items.reduce((sum, item) => sum + (Number(item.duration_minutes) || 30), 0);
+    const hrs = (totalMinutes / 60).toFixed(1);
+    const totalTimeHrs = hrs.endsWith('.0') ? hrs.slice(0, -2) : hrs;
+    const masteryIndex = Math.round(avgScore * 0.8 + (Math.min(totalInterviews, 10) * 2));
+    return { totalInterviews, avgScore, totalTimeHrs, masteryIndex };
+  };
+
+  // Initial history from local storage for immediate rendering
+  const [history, setHistory] = useState(() => {
+    try {
+      const saved = localStorage.getItem(storageKey);
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      return [];
+    }
   });
 
-  const loadDashboardData = () => {
-    // Fetch recent history
-    interviewApi.list().then(data => {
-      if (data && data.length > 0) {
-        setHistory(data.slice(0, 5));
+  const [stats, setStats] = useState(() => {
+    try {
+      const saved = localStorage.getItem(storageKey);
+      if (saved) {
+        const list = JSON.parse(saved);
+        if (list && list.length > 0) return calculateStats(list);
       }
-    }).catch(err => console.error('Failed to load interview history', err));
+    } catch (e) {}
+    return {
+      totalInterviews: 0,
+      avgScore: 0,
+      totalTimeHrs: '0',
+      masteryIndex: 0
+    };
+  });
 
-    // Fetch real analytics summary from backend
-    analyticsApi.summary().then(data => {
-      const masteryIndex = data.totalInterviews > 0 
-        ? Math.round(data.avgScore * 0.8 + (Math.min(data.totalInterviews, 10) * 2))
-        : 0;
-        
-      setStats({ 
-        totalInterviews: data.totalInterviews || 0, 
-        avgScore: data.avgScore || 0, 
-        totalTimeHrs: data.practiceHours || '0', 
-        masteryIndex: masteryIndex 
+  const loadDashboardData = async () => {
+    try {
+      // 1. Get cached local interviews
+      let localList = [];
+      try {
+        const saved = localStorage.getItem(storageKey);
+        if (saved) localList = JSON.parse(saved);
+      } catch (e) {}
+
+      // 2. Fetch interviews from backend
+      let backendList = [];
+      try {
+        backendList = await interviewApi.list();
+      } catch (err) {
+        console.warn('Interview list fetch warning:', err);
+      }
+
+      // 3. Merge backend and local lists with robust deduplication
+      const mergedMap = new Map();
+      (localList || []).forEach(item => {
+        const key = item.id ? `id_${item.id}` : `${item.title}_${item.score}_${item.duration_minutes || 30}_${item.topic || ''}`;
+        mergedMap.set(key, item);
       });
-    }).catch(err => console.error('Failed to load analytics', err));
+      (backendList || []).forEach(item => {
+        const key = item.id ? `id_${item.id}` : `${item.title}_${item.score}_${item.duration_minutes || 30}_${item.topic || ''}`;
+        mergedMap.set(key, item);
+      });
+
+      const mergedList = Array.from(mergedMap.values());
+      mergedList.sort((a, b) => {
+        const dateA = a.created_at ? new Date(a.created_at).getTime() : (a.id || 0);
+        const dateB = b.created_at ? new Date(b.created_at).getTime() : (b.id || 0);
+        return dateB - dateA;
+      });
+
+      // Save updated merged list back to localStorage
+      if (mergedList.length > 0) {
+        try {
+          localStorage.setItem(storageKey, JSON.stringify(mergedList));
+        } catch (e) {}
+        setHistory(mergedList.slice(0, 5));
+      }
+
+      // 4. Auto-sync if client has more records than backend
+      if (backendList && mergedList.length > backendList.length) {
+        try {
+          interviewApi.sync(mergedList).catch(() => {});
+        } catch (e) {}
+      }
+
+      // 5. Update KPI stats — ensure count never decreases
+      if (mergedList.length > 0) {
+        const computed = calculateStats(mergedList);
+        setStats(prev => ({
+          totalInterviews: Math.max(prev.totalInterviews, computed.totalInterviews),
+          avgScore: computed.avgScore,
+          totalTimeHrs: computed.totalTimeHrs,
+          masteryIndex: computed.masteryIndex
+        }));
+      } else {
+        // Fallback to backend summary if history is empty
+        analyticsApi.summary().then(data => {
+          if (data && data.totalInterviews > 0) {
+            const mastery = Math.round((data.avgScore || 0) * 0.8 + (Math.min(data.totalInterviews, 10) * 2));
+            setStats(prev => ({
+              totalInterviews: Math.max(prev.totalInterviews, data.totalInterviews || 0),
+              avgScore: data.avgScore || 0,
+              totalTimeHrs: data.practiceHours || '0',
+              masteryIndex: mastery
+            }));
+          }
+        }).catch(() => {});
+      }
+    } catch (err) {
+      console.error('Failed to load dashboard data', err);
+    }
   };
 
   useEffect(() => {
@@ -47,7 +138,7 @@ export default function DashboardView({ onStartInterview, onNavigate, user }) {
       clearInterval(interval);
       window.removeEventListener('focus', loadDashboardData);
     };
-  }, []);
+  }, [userEmail]);
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
       {/* Hero Welcome Banner */}
