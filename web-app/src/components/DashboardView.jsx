@@ -13,12 +13,9 @@ export default function DashboardView({ onStartInterview, onNavigate, user }) {
     masteryIndex: 0
   });
 
-  useEffect(() => {
-    let mounted = true;
-    
+  const loadDashboardData = () => {
     // Fetch recent history
     interviewApi.list().then(data => {
-      if (!mounted) return;
       if (data && data.length > 0) {
         setHistory(data.slice(0, 5));
       }
@@ -26,9 +23,6 @@ export default function DashboardView({ onStartInterview, onNavigate, user }) {
 
     // Fetch real analytics summary from backend
     analyticsApi.summary().then(data => {
-      if (!mounted) return;
-      
-      // Calculate a more realistic mastery index (weighted heavily by passing scores > 70)
       const masteryIndex = data.totalInterviews > 0 
         ? Math.round(data.avgScore * 0.8 + (Math.min(data.totalInterviews, 10) * 2))
         : 0;
@@ -40,8 +34,19 @@ export default function DashboardView({ onStartInterview, onNavigate, user }) {
         masteryIndex: masteryIndex 
       });
     }).catch(err => console.error('Failed to load analytics', err));
-    
-    return () => { mounted = false; };
+  };
+
+  useEffect(() => {
+    loadDashboardData();
+
+    // Real-time synchronization across Web and Mobile devices
+    const interval = setInterval(loadDashboardData, 8000);
+    window.addEventListener('focus', loadDashboardData);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', loadDashboardData);
+    };
   }, []);
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
