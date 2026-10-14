@@ -41,57 +41,301 @@ export const INTERVIEW_QUESTIONS = {
   swe: [
     {
       id: 'q_swe_1',
+      difficulty: 'Medium',
       question: 'Explain the internal implementation of a HashMap in Java/Kotlin. How does collision resolution work, and what happens when the load factor threshold is exceeded?',
       hint: 'Think about buckets, linked lists vs. red-black trees in Java 8+, and resizing array mechanisms.',
       idealAnswer: 'HashMap uses an array of Node buckets. Hash code determines the bucket index. Collisions are handled via linked lists or transformed into Red-Black Trees when bucket size exceeds 8. Resizing doubles array capacity when size > load factor * capacity.',
-      sampleCode: `// Java 8+ HashMap node bucket structure
-static class Node<K,V> implements Map.Entry<K,V> {
-    final int hash;
-    final K key;
-    V value;
-    Node<K,V> next;
-}`
+      sampleCode: `// Java 8+ HashMap node bucket structure\nstatic class Node<K,V> implements Map.Entry<K,V> {\n    final int hash;\n    final K key;\n    V value;\n    Node<K,V> next;\n}`
     },
     {
       id: 'q_swe_2',
+      difficulty: 'Medium',
       question: 'Compare REST APIs vs. gRPC for microservice-to-microservice communication. What are the key architectural trade-offs in terms of latency, serialization, and browser compatibility?',
       hint: 'Mention HTTP/2 multiplexing, Protocol Buffers vs. JSON payloads, and binary serialization.',
       idealAnswer: 'gRPC utilizes HTTP/2 and Protocol Buffers for compact binary serialization, reducing payload size and network latency significantly compared to REST (HTTP/1.1 JSON). REST is universally supported by web browsers, whereas gRPC requires gRPC-Web proxies.',
+      sampleCode: null
+    },
+    {
+      id: 'q_swe_3',
+      difficulty: 'Hard',
+      question: 'How do Database Indexes (B-Trees vs. Hash Indexes vs. LSM Trees) work internally, and what are the trade-offs of creating a composite index?',
+      hint: 'Consider read vs. write amplification, left-most prefix rule, and log-structured merge trees in write-heavy databases.',
+      idealAnswer: 'B-Trees balance read and write performance with sorted leaf nodes connected in linked lists (O(log N) searches). LSM Trees (used in Cassandra/RocksDB) optimize for high write throughput using in-memory MemTables and append-only SSTables. Composite indexes follow the leftmost prefix rule.',
+      sampleCode: null
+    },
+    {
+      id: 'q_swe_4',
+      difficulty: 'Medium',
+      question: 'What are the four Coffman conditions necessary for a Deadlock to occur in concurrent programming, and how do you prevent them?',
+      hint: 'Mutual exclusion, hold and wait, no preemption, and circular wait. Lock ordering breaks circular wait.',
+      idealAnswer: 'The 4 conditions are Mutual Exclusion, Hold and Wait, No Preemption, and Circular Wait. You can prevent deadlocks by enforcing strict global lock ordering (eliminating circular wait), using try-lock with timeouts, or adopting lock-free concurrent data structures.',
+      sampleCode: null
+    },
+    {
+      id: 'q_swe_5',
+      difficulty: 'Hard',
+      question: 'Explain how Generational Garbage Collection works in modern runtime environments (e.g. JVM, V8). What causes Stop-The-World pauses and how are they minimized?',
+      hint: 'Mention Young generation (Eden, Survivor) vs. Old generation (Tenured) and weak generational hypothesis.',
+      idealAnswer: 'Most objects die young (Weak Generational Hypothesis). Memory is split into Young (Eden, Survivor S0/S1) and Old generations. Minor GC rapidly collects Eden via copying. Objects that survive multiple cycles are promoted to Old generation. Collectors like G1 or ZGC run concurrently in regions to avoid long Stop-The-World pauses.',
+      sampleCode: null
+    },
+    {
+      id: 'q_swe_6',
+      difficulty: 'FAANG Level',
+      question: 'How do you handle Distributed Transactions across independent microservices? Compare the 2-Phase Commit (2PC) protocol with the Saga Pattern.',
+      hint: 'Think about blocking locks in 2PC vs. compensating transactions in choreography or orchestration Saga.',
+      idealAnswer: '2PC provides strong ACID consistency via a Coordinator (Prepare & Commit phases) but causes blocking locks and single point of failure. The Saga pattern provides Eventual Consistency through a sequence of local transactions, triggering Compensating Transactions if any step fails.',
       sampleCode: null
     }
   ],
   sysdesign: [
     {
       id: 'q_sys_1',
+      difficulty: 'Hard',
       question: 'Design a distributed rate limiter that can process 100,000 requests per second across multiple global data centers. Which algorithm and caching layer would you choose?',
       hint: 'Consider Token Bucket vs. Sliding Window Log, Redis cluster with Lua scripts, and local in-memory fallback.',
       idealAnswer: 'Use a Sliding Window Counter algorithm backed by Redis Cluster. Implement Redis Lua scripts to atomically execute rate checks and counter increments. Use local memory (e.g. Caffeine Cache) as a graceful fallback during network partitions.',
-      sampleCode: `-- Redis Lua script for atomic sliding window counter
-local key = KEYS[1]
-local limit = tonumber(ARGV[1])
-local current = tonumber(redis.call('get', key) or "0")
-if current + 1 > limit then
-    return 0
-else
-    redis.call("INCRBY", key, 1)
-    return 1
-end`
+      sampleCode: `-- Redis Lua script for atomic sliding window counter\nlocal key = KEYS[1]\nlocal limit = tonumber(ARGV[1])\nlocal current = tonumber(redis.call('get', key) or "0")\nif current + 1 > limit then return 0 else redis.call("INCRBY", key, 1) return 1 end`
+    },
+    {
+      id: 'q_sys_2',
+      difficulty: 'Medium',
+      question: 'Design a URL Shortener service like TinyURL. How do you generate unique short keys, handle 500 million URLs, and optimize read latency?',
+      hint: 'Think about Base62 encoding, Key Generation Service (KGS) pre-generating tokens, and Cache-Aside pattern.',
+      idealAnswer: 'Use a 7-character Base62 string (62^7 ≈ 3.5 trillion unique keys). Use a dedicated Key Generation Service (KGS) with pre-generated keys stored in DB to avoid runtime collisions and hashing race conditions. Place Redis in front of PostgreSQL using Cache-Aside (LRU policy) for 80/20 read traffic.',
+      sampleCode: null
+    },
+    {
+      id: 'q_sys_3',
+      difficulty: 'Hard',
+      question: 'Design a Distributed Message Broker like Apache Kafka. How do partitions, consumer groups, and offset management guarantee scalability and fault tolerance?',
+      hint: 'Mention append-only commit logs, horizontal partition scaling, sequential disk I/O, and zero-copy data transfer.',
+      idealAnswer: 'Topics are horizontally partitioned across broker nodes. Each partition is an immutable append-only commit log utilizing sequential disk I/O and OS page cache (Zero-Copy sendfile). Consumer groups allow parallel consumption where each partition is read by one consumer in the group, tracking progress via committed offsets.',
+      sampleCode: null
+    },
+    {
+      id: 'q_sys_4',
+      difficulty: 'Medium',
+      question: 'Design a real-time Notification System that delivers push notifications, SMS, and emails to 50 million active users. How do you prevent duplicate deliveries and handle third-party gateway rate limits?',
+      hint: 'Use message queues with idempotency keys, worker pools with token buckets, and priority queues.',
+      idealAnswer: 'Decouple notification requests using RabbitMQ or Kafka. Assign every notification an idempotency key stored in Redis/DB to prevent duplicate sends. Use dedicated asynchronous worker pools for APNs, FCM, Twilio, and SendGrid with rate limiters and exponential backoff retry queues.',
+      sampleCode: null
+    },
+    {
+      id: 'q_sys_5',
+      difficulty: 'FAANG Level',
+      question: 'Design a Video Streaming Architecture like YouTube/Netflix. How do you ingest raw video, transcode into adaptive bitrates, and deliver smooth playback globally?',
+      hint: 'Mention chunking, HLS/DASH protocols, distributed transcoding workers, and CDN edge caching.',
+      idealAnswer: 'Raw video upload goes to Object Storage (S3). Event-driven worker nodes chunk the video and transcode it concurrently into multiple resolutions (1080p, 720p, 480p) using HLS/DASH adaptive bitrate streaming. Chunks and manifest files (.m3u8) are distributed to global CDN edge caches close to users.',
+      sampleCode: null
+    },
+    {
+      id: 'q_sys_6',
+      difficulty: 'Hard',
+      question: 'Explain Cache Invalidation strategies. How do you mitigate the Thundering Herd (Cache Stampede) problem and Cache Penetration in high-traffic applications?',
+      hint: 'Mention Cache-Aside vs Write-Through, mutex locking on cache miss, Bloom Filters, and probabilistic early expiration.',
+      idealAnswer: 'Thundering Herd occurs when a hot cache key expires and thousands of requests hit DB simultaneously. Mitigate using distributed mutex locking (single thread rebuilds cache) or probabilistic early expiration (XFetch algorithm). For Cache Penetration (queries for non-existent keys), use Bloom Filters or cache null objects with short TTL.',
+      sampleCode: null
     }
   ],
   dsa: [
     {
       id: 'q_dsa_1',
+      difficulty: 'Easy',
       question: 'Given an array of integers nums and a target value, find two numbers such that they add up to the target. Optimize your solution for O(N) time complexity.',
       hint: 'Can you use a hash table to store complementary values as you iterate through the array?',
       idealAnswer: 'Iterate through the array while maintaining a HashMap of value -> index. For each number, calculate complement = target - num. If complement exists in map, return indices. Time: O(N), Space: O(N).',
-      sampleCode: `def two_sum(nums, target):
-    seen = {}
-    for i, num in enumerate(nums):
-        complement = target - num
-        if complement in seen:
-            return [seen[complement], i]
-        seen[num] = i
-    return []`
+      sampleCode: `def two_sum(nums, target):\n    seen = {}\n    for i, num in enumerate(nums):\n        complement = target - num\n        if complement in seen:\n            return [seen[complement], i]\n        seen[num] = i\n    return []`
+    },
+    {
+      id: 'q_dsa_2',
+      difficulty: 'Medium',
+      question: 'Design and implement an LRU (Least Recently Used) Cache with O(1) time complexity for both get() and put() operations.',
+      hint: 'Combine a Doubly Linked List for ordering with a Hash Map for O(1) lookups.',
+      idealAnswer: 'Use a Doubly Linked List with dummy head and tail nodes to maintain access order, coupled with a HashMap mapping keys to node pointers. On get(), move node to head. On put(), insert at head; if capacity exceeded, remove node from tail.',
+      sampleCode: null
+    },
+    {
+      id: 'q_dsa_3',
+      difficulty: 'Medium',
+      question: 'How do you detect a cycle in a Directed Graph? Explain both DFS (three-color marking) and BFS (Kahn’s Topological Sort algorithm).',
+      hint: 'In DFS, cycles occur when hitting a node currently in the recursion stack (grey). In Kahn’s, cycles exist if processed nodes < total vertices.',
+      idealAnswer: 'DFS: Mark nodes White (unvisited), Grey (visiting / on stack), Black (fully explored). A cycle is detected if DFS encounters a Grey node. Kahn’s algorithm: Compute in-degrees of all nodes. Repeatedly dequeue 0 in-degree nodes; if total visited < V, a cycle exists.',
+      sampleCode: null
+    },
+    {
+      id: 'q_dsa_4',
+      difficulty: 'Hard',
+      question: 'Merge K sorted linked lists and return it as one sorted list. Analyze the time and space complexity of using a Min-Heap.',
+      hint: 'Initialize a Min-Heap with the head of each of the K lists. Heap size is at most K.',
+      idealAnswer: 'Push the head node of all K lists into a Min-Heap. Continuously pop the minimum node, append it to the result list, and push its next pointer into the heap. Time: O(N log K) where N is total nodes, Space: O(K) for heap storage.',
+      sampleCode: null
+    },
+    {
+      id: 'q_dsa_5',
+      difficulty: 'Hard',
+      question: 'Explain how to find the Median of Two Sorted Arrays of sizes m and n with an optimal O(log(min(m, n))) time complexity.',
+      hint: 'Binary search on the partition of the smaller array so that left half elements <= right half elements.',
+      idealAnswer: 'Partition both arrays into left and right halves such that total left elements equal total right elements and max(left) <= min(right). Perform binary search on the partition point of the smaller array. Time: O(log(min(m, n))), Space: O(1).',
+      sampleCode: null
+    },
+    {
+      id: 'q_dsa_6',
+      difficulty: 'Hard',
+      question: 'Explain the Trapping Rain Water problem. How do you solve it in O(N) time and O(1) auxiliary space using two pointers?',
+      hint: 'Water trapped at position i is min(left_max, right_max) - height[i]. Move the pointer with the smaller max height inward.',
+      idealAnswer: 'Maintain left and right pointers with left_max and right_max. If left_max < right_max, water is bounded by left_max, so add max(0, left_max - height[left]) and advance left. Otherwise, process right. Time: O(N), Space: O(1).',
+      sampleCode: null
+    }
+  ],
+  aiml: [
+    {
+      id: 'q_aiml_1',
+      difficulty: 'Hard',
+      question: 'Explain the Scaled Dot-Product Attention mechanism in Transformers. Why is the dot product scaled by sqrt(d_k), and what is the computational complexity of Self-Attention?',
+      hint: 'Attention(Q,K,V) = softmax(QK^T / sqrt(d_k)) * V. For sequence length N, matrix multiplication is O(N^2).',
+      idealAnswer: 'Scaled Dot-Product Attention computes similarities between Query (Q) and Key (K) vectors, applies softmax, and weights Value (V) vectors. Scaling by sqrt(d_k) prevents dot products from growing excessively large in high dimensions, which would cause vanishing gradients in softmax. Time complexity is O(N^2 * d).',
+      sampleCode: null
+    },
+    {
+      id: 'q_aiml_2',
+      difficulty: 'Medium',
+      question: 'What is Retrieval-Augmented Generation (RAG)? Compare naive RAG vs. advanced RAG with hybrid search (dense + sparse) and reranking.',
+      hint: 'Naive RAG uses cosine similarity on vector embeddings. Advanced RAG combines BM25 keyword matching with vector search and cross-encoder rerankers.',
+      idealAnswer: 'RAG retrieves external domain knowledge to ground LLM generations. Naive RAG suffers from semantic drift and poor keyword precision. Advanced RAG combines dense semantic search (vector embeddings) with sparse keyword search (BM25/SPLADE) via Reciprocal Rank Fusion (RRF), followed by a Cross-Encoder Reranker to filter noise.',
+      sampleCode: null
+    },
+    {
+      id: 'q_aiml_3',
+      difficulty: 'Medium',
+      question: 'Explain parameter-efficient fine-tuning (PEFT) using LoRA (Low-Rank Adaptation). How does decomposing weight matrices into low-rank representations reduce memory footprint?',
+      hint: 'W_new = W_0 + B * A where B is (d x r) and A is (r x k) with rank r << min(d, k).',
+      idealAnswer: 'Instead of retraining all billions of parameters, LoRA freezes the pre-trained weights W_0 and injects trainable rank-decomposition matrices A and B (delta W = B * A, where rank r is small like 8 or 16). This reduces trainable parameters and optimizer memory by over 90% without losing quality.',
+      sampleCode: null
+    },
+    {
+      id: 'q_aiml_4',
+      difficulty: 'Hard',
+      question: 'How do Approximate Nearest Neighbor (ANN) search algorithms like HNSW (Hierarchical Navigable Small World) work for vector databases?',
+      hint: 'Multi-layer graph traversal with skip-list mechanics to achieve logarithmic search time.',
+      idealAnswer: 'HNSW constructs a hierarchical multi-layer graph where top layers have sparse, long-range connections for fast coarse routing, and bottom layers have dense local connections for precise search. This transforms brute-force O(N) vector similarity into O(log N) probabilistic search.',
+      sampleCode: null
+    },
+    {
+      id: 'q_aiml_5',
+      difficulty: 'Medium',
+      question: 'How do you detect and mitigate Overfitting in Deep Neural Networks? Explain the mathematical intuition behind Dropout and Weight Decay (L2 Regularization).',
+      hint: 'Overfitting: low training loss but high validation loss. Dropout randomly zeroes activations; L2 adds sum of squared weights penalty.',
+      idealAnswer: 'Overfitting occurs when a model memorizes training noise. Dropout randomly deactivates neurons during training with probability p, preventing co-adaptation and acting as an ensemble of sub-networks. L2 regularization (Weight Decay) penalizes large weight magnitudes (lambda * ||W||^2), favoring smoother decision boundaries.',
+      sampleCode: null
+    },
+    {
+      id: 'q_aiml_6',
+      difficulty: 'FAANG Level',
+      question: 'Explain key LLM inference optimization techniques: KV Caching, PagedAttention (vLLM), and Model Quantization (INT8 / INT4 AWQ / GPTQ).',
+      hint: 'KV caching avoids recomputing past tokens in autoregressive generation. PagedAttention eliminates memory fragmentation.',
+      idealAnswer: 'Autoregressive generation generates one token at a time; KV Cache stores previous Keys and Values so past tokens are not re-encoded. PagedAttention manages KV cache memory like virtual memory pages in an OS, reducing fragmentation. Quantization (AWQ/GPTQ) compresses FP16 weights to 4-bit or 8-bit integers with minimal perplexity loss.',
+      sampleCode: null
+    }
+  ],
+  pm: [
+    {
+      id: 'q_pm_1',
+      difficulty: 'Hard',
+      question: 'Daily Active Users (DAU) dropped by 5% over the past week, but total user engagement time increased by 15%. How do you systematically diagnose and resolve this trade-off?',
+      hint: 'Segment users by cohort, platform, geography, and feature usage. Investigate if casual users churned while power users engaged more.',
+      idealAnswer: 'Segment the data by demographics, acquisition channel, platform (iOS/Android), and feature cohorts. A drop in DAU alongside an increase in time spent often indicates that casual/marginal users churned (perhaps due to an onboarding roadblock or UI redesign) while power users are spending more time. Verify if revenue or core conversion was harmed before taking corrective steps.',
+      sampleCode: null
+    },
+    {
+      id: 'q_pm_2',
+      difficulty: 'Medium',
+      question: 'How do you prioritize features on a product roadmap using the RICE Framework? How do you balance high-priority customer features against technical debt?',
+      hint: 'RICE = (Reach * Impact * Confidence) / Effort. Allocate a fixed capacity (e.g. 20%) for tech debt.',
+      idealAnswer: 'Score features across Reach (users impacted per quarter), Impact (scale 1-3), Confidence (0-100% based on research), and Effort (person-months). To manage technical debt, negotiate an ongoing engineering capacity allocation (e.g., 20% of every sprint) tied to stability and latency metrics.',
+      sampleCode: null
+    },
+    {
+      id: 'q_pm_3',
+      difficulty: 'Hard',
+      question: 'You launched a new peer-to-peer mobile payments feature, and the 30-day user retention rate is only 12%. Walk me through your root-cause discovery process.',
+      hint: 'Analyze the entire user funnel: discovery -> KYC/linking bank -> sending first payment -> recipient onboarding.',
+      idealAnswer: 'Map the complete activation funnel to locate drop-off bottlenecks. Check if recipient friction is high (e.g., recipient must download app to claim funds), if transaction failure rates are elevated, or if notifications are failing. Conduct qualitative user interviews to understand trust barriers.',
+      sampleCode: null
+    },
+    {
+      id: 'q_pm_4',
+      difficulty: 'Medium',
+      question: 'Design an accessible e-commerce grocery delivery mobile application tailored for elderly and visually impaired users.',
+      hint: 'Voice navigation, large touch targets, high contrast, screen reader compatibility, and simplified checkout.',
+      idealAnswer: 'Prioritize voice-first search and natural speech ordering ("order milk and eggs"). Design high-contrast visual themes with dynamic large typography, minimum 48px touch targets, full VoiceOver/TalkBack compatibility, one-tap reorders, and direct phone support fallback.',
+      sampleCode: null
+    },
+    {
+      id: 'q_pm_5',
+      difficulty: 'Hard',
+      question: 'What is the North Star Metric for Airbnb? How do you break it down into leading input metrics for supply and demand?',
+      hint: 'North Star is Nights Booked. Supply input: active host listings; Demand input: search-to-book conversion.',
+      idealAnswer: 'Airbnb’s North Star Metric is "Nights Booked". Demand side input metrics: Search volume, listing view-to-inquiry rate, checkout completion rate. Supply side input metrics: New listing sign-ups, host response time, calendar availability, and review satisfaction scores.',
+      sampleCode: null
+    },
+    {
+      id: 'q_pm_6',
+      difficulty: 'FAANG Level',
+      question: 'How would you decide whether to kill an existing, legacy product feature that 5% of your enterprise customers use daily, but costs 30% of engineering maintenance?',
+      hint: 'Calculate maintenance cost vs customer churn risk, feature migration path, or grandfathered tiering.',
+      idealAnswer: 'Assess the ARR contribution and contract renewal timing of that 5% user base. Build an automated migration path to modern alternatives. Offer a sunset transition timeline (e.g., 6 months notice) or introduce an enterprise premium support add-on to offset maintenance costs.',
+      sampleCode: null
+    }
+  ],
+  devops: [
+    {
+      id: 'q_devops_1',
+      difficulty: 'Medium',
+      question: 'A production Kubernetes Pod is stuck in a CrashLoopBackOff state. Step-by-step, how do you diagnose and resolve the issue using kubectl?',
+      hint: 'kubectl describe pod for events; kubectl logs --previous for exit codes and fatal crash exceptions.',
+      idealAnswer: '1) Run `kubectl describe pod <name>` to check Pod events, readiness/liveness probe failures, and OOMKilled signals. 2) Run `kubectl logs <name> --previous` to inspect application crash stack traces before the restart. 3) Verify ConfigMaps, Secrets, environment variables, and memory limits.',
+      sampleCode: `kubectl describe pod <pod-name> -n production\nkubectl logs <pod-name> -c <container-name> --previous\nkubectl get events --sort-by=.metadata.creationTimestamp`
+    },
+    {
+      id: 'q_devops_2',
+      difficulty: 'Hard',
+      question: 'Compare Blue-Green Deployments vs. Canary Releases vs. Rolling Updates. Which strategy would you choose for a zero-downtime database schema migration?',
+      hint: 'Database schema changes require backwards-compatible expand-and-contract (parallel run) pattern.',
+      idealAnswer: 'Rolling Updates update instances incrementally; Blue-Green switches router traffic instantly between two environments; Canary routes a small percentage (e.g. 5%) of live traffic to test new versions. For DB schema changes, apply the Expand-and-Contract (Parallel Run) pattern: add new column, support both in code, backfill data, and drop old column.',
+      sampleCode: null
+    },
+    {
+      id: 'q_devops_3',
+      difficulty: 'Hard',
+      question: 'How do you detect, prevent, and remediate Terraform State Drift in an enterprise multi-cloud infrastructure setup?',
+      hint: 'Use automated CI/CD terraform plan scheduled runs, drift detection tools (Driftctl), and strict IAM permissions.',
+      idealAnswer: 'Run scheduled headless `terraform plan -detailed-exitcode` in CI/CD (e.g. nightly) to alert on state differences. Enforce strict cloud IAM boundaries preventing manual console changes. Remediate drift by importing external resources (`terraform import`) or re-applying declared state.',
+      sampleCode: null
+    },
+    {
+      id: 'q_devops_4',
+      difficulty: 'Medium',
+      question: 'Your team’s CI/CD pipeline takes 45 minutes to build, test, and push Docker images. How would you optimize it to complete in under 8 minutes?',
+      hint: 'Multi-stage Docker builds, layer caching, BuildKit, test parallelization, and dependency caching.',
+      idealAnswer: '1) Enable Docker BuildKit with remote cache (`--cache-from`). 2) Order Dockerfile instructions so rarely changed dependencies (npm install / go mod) are cached before source code. 3) Shard and parallelize unit/integration test suites across multiple CI runners. 4) Cache package manager dependencies (node_modules, pip).',
+      sampleCode: null
+    },
+    {
+      id: 'q_devops_5',
+      difficulty: 'Hard',
+      question: 'Explain AWS VPC architecture: When would you place a resource in a Public vs. Private Subnet, and how do NAT Gateways and Security Groups differ from Network ACLs?',
+      hint: 'Public subnets have an IGW route; Private subnets route outbound internet via NAT Gateway. Security Groups are stateful; NACLs are stateless.',
+      idealAnswer: 'Public subnets host user-facing load balancers with Internet Gateway (IGW) routes. Databases and application microservices reside in Private subnets with no direct ingress, routing outbound traffic through a NAT Gateway. Security Groups are stateful and operate at the ENI level; Network ACLs are stateless subnet-level packet filters.',
+      sampleCode: null
+    },
+    {
+      id: 'q_devops_6',
+      difficulty: 'FAANG Level',
+      question: 'What are the Three Pillars of Observability (Metrics, Logs, Tracing)? How do you configure OpenTelemetry and distributed tracing to pinpoint microservice latency bottlenecks?',
+      hint: 'Metrics quantify symptoms; logs provide context; distributed tracing (W3C Trace Context) tracks requests across async hops.',
+      idealAnswer: 'Metrics (Prometheus) provide aggregate health indicators; Logs (Loki/ELK) provide event context; Distributed Tracing (Jaeger/Tempo) tracks request lifecycles across distributed services using a W3C traceparent header. Spans record start/end times and network overhead across RPC calls to identify exact latency bottlenecks.',
+      sampleCode: null
     }
   ]
 };

@@ -5,10 +5,30 @@ import { aiApi } from '../services/api';
 
 export default function LiveInterviewView({ sessionConfig, onEndSession }) {
   const { role, persona, difficulty, duration } = sessionConfig;
-  const questions = INTERVIEW_QUESTIONS[role.id] || INTERVIEW_QUESTIONS['swe'];
+
+  // Dynamically select and shuffle questions so every session has different questions!
+  const [sessionQuestions] = useState(() => {
+    const roleId = role?.id || 'swe';
+    const pool = INTERVIEW_QUESTIONS[roleId] || INTERVIEW_QUESTIONS['swe'];
+    
+    // Check if difficulty matches any questions, otherwise use the role pool
+    const diffMatch = pool.filter(q => q.difficulty?.toLowerCase() === difficulty?.toLowerCase());
+    const candidates = diffMatch.length >= 2 ? diffMatch : pool;
+
+    // Fisher-Yates unbiased shuffle algorithm
+    const shuffled = [...candidates];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    // Scale question count based on duration (15m: 2Q, 30m: 3Q, 45m+: 4Q)
+    const targetCount = Math.max(2, Math.min(shuffled.length, Math.floor(parseInt(duration || 30) / 10)));
+    return shuffled.slice(0, targetCount);
+  });
 
   const [currentQIndex, setCurrentQIndex] = useState(0);
-  const currentQuestion = questions[currentQIndex] || questions[0];
+  const currentQuestion = sessionQuestions[currentQIndex] || sessionQuestions[0];
 
   const [isMicActive, setIsMicActive] = useState(false);
   const [isAiSpeaking, setIsAiSpeaking] = useState(false);
@@ -97,7 +117,7 @@ export default function LiveInterviewView({ sessionConfig, onEndSession }) {
     const newAnswers = [...allAnswers, textAnswer];
     setAllAnswers(newAnswers);
 
-    if (currentQIndex < questions.length - 1) {
+    if (currentQIndex < sessionQuestions.length - 1) {
       setCurrentQIndex((prev) => prev + 1);
       setTextAnswer('');
       setSpeechTranscript('');
@@ -241,7 +261,7 @@ export default function LiveInterviewView({ sessionConfig, onEndSession }) {
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
               <span style={{ fontSize: '12px', fontWeight: '800', color: 'var(--primary)', letterSpacing: '0.5px' }}>
-                QUESTION {currentQIndex + 1} OF {questions.length}
+                QUESTION {currentQIndex + 1} OF {sessionQuestions.length}
               </span>
               <button
                 onClick={() => setShowHint(!showHint)}
