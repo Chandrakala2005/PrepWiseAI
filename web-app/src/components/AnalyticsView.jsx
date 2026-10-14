@@ -172,7 +172,7 @@ export default function AnalyticsView({ onStartNewInterview, sessionResult }) {
       {/* AI Answer Critique & Highlights */}
       <div className="glass-panel" style={{ padding: '24px' }}>
         <h3 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <MessageSquare size={18} color="var(--primary)" /> AI Answer-by-Answer Evaluation & Key Concepts
+          <MessageSquare size={18} color="var(--primary)" /> {sessionResult.ai_persona || 'AI'} Performance Critique & Highlights
         </h3>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -183,15 +183,40 @@ export default function AnalyticsView({ onStartNewInterview, sessionResult }) {
             border: '1px solid var(--border-glass)'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <span style={{ fontSize: '14px', fontWeight: '700' }}>Question 1: HashMap Implementation & Treeify Threshold</span>
-              <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--accent-emerald)' }}>Score: 95/100</span>
+              <span style={{ fontSize: '14px', fontWeight: '700' }}>Overall Assessment: {sessionResult.title || 'Technical Interview'}</span>
+              <span style={{ fontSize: '12px', fontWeight: '700', color: score >= 80 ? 'var(--accent-emerald)' : 'var(--accent-amber)' }}>
+                Score: {score}/100
+              </span>
             </div>
-            <p style={{ fontSize: '13px', color: 'var(--text-muted)', lineHeight: 1.5, marginBottom: '10px' }}>
-              <strong>AI Feedback:</strong> Excellent explanation of bucket indices, hashing functions, load factor threshold (0.75), and Red-Black tree conversion when bucket size reaches 8.
+            <p style={{ fontSize: '13px', color: 'var(--text-main)', lineHeight: 1.5, marginBottom: '12px' }}>
+              <strong>AI Feedback:</strong> {sessionResult.feedback || 'Detailed review of responses shows solid conceptual grasp of primary software engineering practices and patterns.'}
             </p>
-            <div style={{ fontSize: '12px', color: 'var(--accent-teal)', fontWeight: '600' }}>
-              ✓ Key Strengths: Mentioned Java 8+ treeification threshold and Big-O trade-offs.
-            </div>
+
+            {sessionResult.strengths && sessionResult.strengths.length > 0 && (
+              <div style={{ marginBottom: '8px' }}>
+                <div style={{ fontSize: '12px', color: 'var(--accent-emerald)', fontWeight: '700', marginBottom: '4px' }}>
+                  ✓ Key Strengths:
+                </div>
+                <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '12px', color: 'var(--text-muted)' }}>
+                  {sessionResult.strengths.map((str, idx) => (
+                    <li key={idx} style={{ marginBottom: '2px' }}>{str}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {sessionResult.improvements && sessionResult.improvements.length > 0 && (
+              <div>
+                <div style={{ fontSize: '12px', color: 'var(--accent-amber)', fontWeight: '700', marginBottom: '4px' }}>
+                  ⚡ Areas for Improvement:
+                </div>
+                <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '12px', color: 'var(--text-muted)' }}>
+                  {sessionResult.improvements.map((imp, idx) => (
+                    <li key={idx} style={{ marginBottom: '2px' }}>{imp}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -44,10 +44,12 @@ app.use(async (req, res, next) => {
 const authRoutes = require('./routes/auth.cjs');
 const userRoutes = require('./routes/user.cjs');
 const interviewRoutes = require('./routes/interviews.cjs');
+const aiRoutes = require('./routes/ai.cjs');
 
 app.use(['/api/auth', '/auth'], authRoutes);
 app.use(['/api/user', '/user'], userRoutes);
 app.use(['/api/interviews', '/interviews'], interviewRoutes);
+app.use(['/api/ai', '/ai'], aiRoutes);
 
 // Alias analytics to interviews for simplicity in this demo structure
 app.use(['/api/analytics', '/analytics'], interviewRoutes);

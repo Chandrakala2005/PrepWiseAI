@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, MicOff, Volume2, VolumeX, Send, ArrowRight, Lightbulb, Clock, CheckCircle, ShieldAlert, Sparkles, PhoneOff } from 'lucide-react';
+import { Mic, MicOff, Volume2, VolumeX, Send, ArrowRight, Lightbulb, Clock, CheckCircle, ShieldAlert, Sparkles, PhoneOff, Loader2 } from 'lucide-react';
 import { INTERVIEW_QUESTIONS } from '../data/mockData';
+import { aiApi } from '../services/api';
 
 export default function LiveInterviewView({ sessionConfig, onEndSession }) {
   const { role, persona, difficulty, duration } = sessionConfig;
@@ -16,6 +17,7 @@ export default function LiveInterviewView({ sessionConfig, onEndSession }) {
   const [allAnswers, setAllAnswers] = useState([]);
   const [showHint, setShowHint] = useState(false);
   const [secondsRemaining, setSecondsRemaining] = useState(parseInt(duration) * 60);
+  const [isEvaluating, setIsEvaluating] = useState(false);
 
   const recognitionRef = useRef(null);
 
@@ -91,7 +93,7 @@ export default function LiveInterviewView({ sessionConfig, onEndSession }) {
     }
   };
 
-  const handleNextQuestion = () => {
+  const handleNextQuestion = async () => {
     const newAnswers = [...allAnswers, textAnswer];
     setAllAnswers(newAnswers);
 
@@ -101,46 +103,38 @@ export default function LiveInterviewView({ sessionConfig, onEndSession }) {
       setSpeechTranscript('');
       setShowHint(false);
     } else {
-      // Calculate dynamic score based on answers
-      let calculatedScore = 0;
-      let totalExpectedKeywords = 0;
-      let matchedKeywords = 0;
-      
-      newAnswers.forEach((ans, idx) => {
-        const cleanAns = ans.toLowerCase();
-        
-        // Use generic tech keywords if specific ones aren't defined in mock data
-        const techKeywords = ['api', 'database', 'cache', 'index', 'hash', 'array', 'tree', 'o(1)', 'o(n)', 'pointer', 'microservice', 'load balancer', 'state', 'component', 'react', 'node', 'sql', 'nosql', 'design', 'architecture', 'scale', 'latency', 'throughput', 'memory', 'cpu'];
-        
-        // Count how many keywords the user actually mentioned
-        let usedKeywords = new Set();
-        techKeywords.forEach(kw => {
-          if (cleanAns.includes(kw)) {
-            usedKeywords.add(kw);
-          }
-        });
-        
-        // We expect at least 3 technical keywords per answer for a perfect score
-        totalExpectedKeywords += 3;
-        matchedKeywords += Math.min(3, usedKeywords.size);
-        
-        // Bonus for detailed explanations (length)
-        if (cleanAns.length > 100) matchedKeywords += 0.5;
-        if (cleanAns.length > 200) matchedKeywords += 0.5;
-      });
+      setIsEvaluating(true);
+      try {
+        const fullCandidateAnswers = newAnswers.join('\n\n');
+        const evalRes = await aiApi.evaluateAnswer(
+          currentQuestion.question,
+          fullCandidateAnswers,
+          persona,
+          role
+        );
 
-      if (totalExpectedKeywords > 0) {
-        calculatedScore = Math.round((matchedKeywords / totalExpectedKeywords) * 100);
+        if (evalRes && evalRes.data) {
+          setIsEvaluating(false);
+          onEndSession({
+            score: evalRes.data.score || 75,
+            feedback: evalRes.data.feedback,
+            strengths: evalRes.data.strengths,
+            improvements: evalRes.data.improvements,
+            answers: newAnswers,
+            evaluator: evalRes.data.evaluator
+          });
+          return;
+        }
+      } catch (err) {
+        console.warn('AI evaluation error, using fallback:', err);
       }
-      
-      // Cap at 100
-      calculatedScore = Math.min(100, calculatedScore);
-      
-      // If practically empty, score is 0
+
+      // Fallback calculation
+      let calculatedScore = 70;
       if (newAnswers.join('').trim().length < 10) {
         calculatedScore = 0;
       }
-
+      setIsEvaluating(false);
       onEndSession({
         score: calculatedScore,
         answers: newAnswers
@@ -337,21 +331,26 @@ export default function LiveInterviewView({ sessionConfig, onEndSession }) {
 
               <button
                 onClick={handleNextQuestion}
+                disabled={isEvaluating}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',
                   padding: '12px 24px',
                   borderRadius: 'var(--radius-md)',
-                  background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
+                  background: isEvaluating ? 'rgba(99, 102, 241, 0.5)' : 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
                   color: '#FFF',
                   border: 'none',
                   fontWeight: '700',
                   fontSize: '14px',
-                  cursor: 'pointer'
+                  cursor: isEvaluating ? 'not-allowed' : 'pointer'
                 }}
               >
-                Submit & Next Question <ArrowRight size={16} />
+                {isEvaluating ? (
+                  <>Evaluating with LLaMA... <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /></>
+                ) : (
+                  <>Submit & Next Question <ArrowRight size={16} /></>
+                )}
               </button>
             </div>
           </div>

@@ -100,3 +100,19 @@ export const interviewApi = {
 export const analyticsApi = {
   summary: () => fetchApi('/analytics/summary')
 };
+
+// ─── AI & LLAMA API ──────────────────────────────────────────
+
+export const aiApi = {
+  evaluateAnswer: (question, candidateAnswer, persona, role) =>
+    fetchApi('/ai/evaluate-answer', {
+      method: 'POST',
+      body: JSON.stringify({ question, candidateAnswer, persona, role })
+    }),
+
+  analyzeResume: (resumeText) =>
+    fetchApi('/ai/analyze-resume', {
+      method: 'POST',
+      body: JSON.stringify({ resumeText })
+    })
+};
