@@ -134,18 +134,272 @@ export const FLASHCARDS = [
 export const CODING_PROBLEMS = [
   {
     id: 'code_1',
+    number: 1,
+    title: 'Two Sum',
+    difficulty: 'Easy',
+    category: 'Arrays & Hashing',
+    acceptance: '53.6%',
+    description: 'Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target. You may assume that each input would have exactly one solution, and you may not use the same element twice.',
+    constraints: [
+      '2 <= nums.length <= 10^4',
+      '-10^9 <= nums[i] <= 10^9',
+      '-10^9 <= target <= 10^9',
+      'Only one valid answer exists.'
+    ],
+    starterCode: {
+      python: `def twoSum(nums, target):\n    # Time: O(n), Space: O(n) using a hash map\n    prev_map = {}\n    for i, n in enumerate(nums):\n        diff = target - n\n        if diff in prev_map:\n            return [prev_map[diff], i]\n        prev_map[n] = i\n    return []`,
+      javascript: `function twoSum(nums, target) {\n    const map = new Map();\n    for (let i = 0; i < nums.length; i++) {\n        const diff = target - nums[i];\n        if (map.has(diff)) {\n            return [map.get(diff), i];\n        }\n        map.set(nums[i], i);\n    }\n    return [];\n}`,
+      java: `public int[] twoSum(int[] nums, int target) {\n    Map<Integer, Integer> map = new HashMap<>();\n    for (int i = 0; i < nums.length; i++) {\n        int diff = target - nums[i];\n        if (map.containsKey(diff)) {\n            return new int[] { map.get(diff), i };\n        }\n        map.put(nums[i], i);\n    }\n    return new int[0];\n}`
+    },
+    hints: [
+      'A brute force O(n^2) check checks every pair.',
+      'Can you use a Hash Table to look up the complement in O(1) time?'
+    ],
+    testCases: [
+      { input: 'nums = [2,7,11,15], target = 9', expected: '[0,1]' },
+      { input: 'nums = [3,2,4], target = 6', expected: '[1,2]' },
+      { input: 'nums = [3,3], target = 6', expected: '[0,1]' }
+    ]
+  },
+  {
+    id: 'code_2',
+    number: 206,
+    title: 'Reverse Linked List',
+    difficulty: 'Easy',
+    category: 'Linked Lists',
+    acceptance: '76.8%',
+    description: 'Given the head of a singly linked list, reverse the list, and return the reversed list.',
+    constraints: [
+      'The number of nodes in the list is the range [0, 5000].',
+      '-5000 <= Node.val <= 5000'
+    ],
+    starterCode: {
+      python: `def reverseList(head):\n    prev = None\n    curr = head\n    while curr:\n        nxt = curr.next\n        curr.next = prev\n        prev = curr\n        curr = nxt\n    return prev`,
+      javascript: `function reverseList(head) {\n    let prev = null;\n    let curr = head;\n    while (curr) {\n        const next = curr.next;\n        curr.next = prev;\n        prev = curr;\n        curr = next;\n    }\n    return prev;\n}`,
+      java: `public ListNode reverseList(ListNode head) {\n    ListNode prev = null;\n    ListNode curr = head;\n    while (curr != null) {\n        ListNode next = curr.next;\n        curr.next = prev;\n        prev = curr;\n        curr = next;\n    }\n    return prev;\n}`
+    },
+    hints: [
+      'Maintain three pointers: prev, curr, and next.',
+      'Reverse the pointer direction at each step: curr.next = prev.'
+    ],
+    testCases: [
+      { input: 'head = [1,2,3,4,5]', expected: '[5,4,3,2,1]' },
+      { input: 'head = [1,2]', expected: '[2,1]' },
+      { input: 'head = []', expected: '[]' }
+    ]
+  },
+  {
+    id: 'code_3',
+    number: 121,
+    title: 'Best Time to Buy and Sell Stock',
+    difficulty: 'Easy',
+    category: 'Arrays & Greedy',
+    acceptance: '54.5%',
+    description: 'You are given an array prices where prices[i] is the price of a given stock on the ith day. You want to maximize your profit by choosing a single day to buy one stock and choosing a different day in the future to sell that stock. Return the maximum profit you can achieve from this transaction.',
+    constraints: [
+      '1 <= prices.length <= 10^5',
+      '0 <= prices[i] <= 10^4'
+    ],
+    starterCode: {
+      python: `def maxProfit(prices):\n    min_price = float('inf')\n    max_profit = 0\n    for p in prices:\n        min_price = min(min_price, p)\n        max_profit = max(max_profit, p - min_price)\n    return max_profit`,
+      javascript: `function maxProfit(prices) {\n    let minPrice = Infinity;\n    let maxProfit = 0;\n    for (const p of prices) {\n        minPrice = Math.min(minPrice, p);\n        maxProfit = Math.max(maxProfit, p - minPrice);\n    }\n    return maxProfit;\n}`,
+      java: `public int maxProfit(int[] prices) {\n    int minPrice = Integer.MAX_VALUE;\n    int maxProfit = 0;\n    for (int p : prices) {\n        minPrice = Math.min(minPrice, p);\n        maxProfit = Math.max(maxProfit, p - minPrice);\n    }\n    return maxProfit;\n}`
+    },
+    hints: [
+      'Track the minimum price seen so far as you iterate through the days.',
+      'Calculate potential profit at each step: current_price - min_price.'
+    ],
+    testCases: [
+      { input: 'prices = [7,1,5,3,6,4]', expected: '5' },
+      { input: 'prices = [7,6,4,3,1]', expected: '0' }
+    ]
+  },
+  {
+    id: 'code_4',
+    number: 125,
+    title: 'Valid Palindrome',
+    difficulty: 'Easy',
+    category: 'Two Pointers & Strings',
+    acceptance: '48.2%',
+    description: 'A phrase is a palindrome if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward. Alphanumeric characters include letters and numbers.',
+    constraints: [
+      '1 <= s.length <= 2 * 10^5',
+      's consists only of printable ASCII characters.'
+    ],
+    starterCode: {
+      python: `def isPalindrome(s: str) -> bool:\n    l, r = 0, len(s) - 1\n    while l < r:\n        while l < r and not s[l].isalnum(): l += 1\n        while l < r and not s[r].isalnum(): r -= 1\n        if s[l].lower() != s[r].lower(): return False\n        l, r = l + 1, r - 1\n    return True`,
+      javascript: `function isPalindrome(s) {\n    const clean = s.toLowerCase().replace(/[^a-z0-9]/g, '');\n    return clean === clean.split('').reverse().join('');\n}`,
+      java: `public boolean isPalindrome(String s) {\n    int l = 0, r = s.length() - 1;\n    while (l < r) {\n        while (l < r && !Character.isLetterOrDigit(s.charAt(l))) l++;\n        while (l < r && !Character.isLetterOrDigit(s.charAt(r))) r--;\n        if (Character.toLowerCase(s.charAt(l)) != Character.toLowerCase(s.charAt(r))) return false;\n        l++; r--;\n    }\n    return true;\n}`
+    },
+    hints: [
+      'Two pointers moving towards each other can solve this in O(n) time and O(1) extra space.',
+      'Skip non-alphanumeric characters using pointers.'
+    ],
+    testCases: [
+      { input: 's = "A man, a plan, a canal: Panama"', expected: 'true' },
+      { input: 's = "race a car"', expected: 'false' },
+      { input: 's = " "', expected: 'true' }
+    ]
+  },
+  {
+    id: 'code_5',
+    number: 98,
     title: 'Validate Binary Search Tree',
     difficulty: 'Medium',
     category: 'Trees & DFS',
-    description: 'Given the root of a binary tree, determine if it is a valid binary search tree (BST). A valid BST guarantees left node values < root < right node values.',
+    acceptance: '33.1%',
+    description: 'Given the root of a binary tree, determine if it is a valid binary search tree (BST). A valid BST guarantees that the left subtree of a node contains only nodes with keys strictly less than the node key, and the right subtree contains only keys strictly greater than the node key.',
+    constraints: [
+      'The number of nodes in the tree is in the range [1, 10^4].',
+      '-2^31 <= Node.val <= 2^31 - 1'
+    ],
     starterCode: {
-      python: `def isValidBST(root):\n    # Write your solution here\n    pass`,
-      javascript: `function isValidBST(root) {\n    // Write your solution here\n    return true;\n}`,
-      java: `public boolean isValidBST(TreeNode root) {\n    // Write your solution here\n    return true;\n}`
+      python: `def isValidBST(root):\n    def validate(node, low=-float('inf'), high=float('inf')):\n        if not node: return True\n        if not (low < node.val < high): return False\n        return validate(node.left, low, node.val) and validate(node.right, node.val, high)\n    return validate(root)`,
+      javascript: `function isValidBST(root) {\n    function validate(node, min = -Infinity, max = Infinity) {\n        if (!node) return true;\n        if (node.val <= min || node.val >= max) return false;\n        return validate(node.left, min, node.val) && validate(node.right, node.val, max);\n    }\n    return validate(root);\n}`,
+      java: `public boolean isValidBST(TreeNode root) {\n    return validate(root, Long.MIN_VALUE, Long.MAX_VALUE);\n}\nprivate boolean validate(TreeNode node, long min, long max) {\n    if (node == null) return true;\n    if (node.val <= min || node.val >= max) return false;\n    return validate(node.left, min, node.val) && validate(node.right, node.val, max);\n}`
     },
+    hints: [
+      'It is not sufficient that left.val < root.val. All nodes in the left subtree must be less than root.',
+      'Pass down valid ranges (low, high) during recursive DFS traversal.'
+    ],
     testCases: [
       { input: 'root = [2,1,3]', expected: 'true' },
       { input: 'root = [5,1,4,null,null,3,6]', expected: 'false' }
+    ]
+  },
+  {
+    id: 'code_6',
+    number: 3,
+    title: 'Longest Substring Without Repeating Characters',
+    difficulty: 'Medium',
+    category: 'Sliding Window',
+    acceptance: '35.4%',
+    description: 'Given a string s, find the length of the longest substring without repeating characters.',
+    constraints: [
+      '0 <= s.length <= 5 * 10^4',
+      's consists of English letters, digits, symbols and spaces.'
+    ],
+    starterCode: {
+      python: `def lengthOfLongestSubstring(s: str) -> int:\n    char_set = set()\n    l = 0\n    res = 0\n    for r in range(len(s)):\n        while s[r] in char_set:\n            char_set.remove(s[l])\n            l += 1\n        char_set.add(s[r])\n        res = max(res, r - l + 1)\n    return res`,
+      javascript: `function lengthOfLongestSubstring(s) {\n    const set = new Set();\n    let l = 0, res = 0;\n    for (let r = 0; r < s.length; r++) {\n        while (set.has(s[r])) {\n            set.delete(s[l]);\n            l++;\n        }\n        set.add(s[r]);\n        res = Math.max(res, r - l + 1);\n    }\n    return res;\n}`,
+      java: `public int lengthOfLongestSubstring(String s) {\n    Set<Character> set = new HashSet<>();\n    int l = 0, res = 0;\n    for (int r = 0; r < s.length(); r++) {\n        while (set.contains(s.charAt(r))) {\n            set.remove(s.charAt(l++));\n        }\n        set.add(s.charAt(r));\n        res = Math.max(res, r - l + 1);\n    }\n    return res;\n}`
+    },
+    hints: [
+      'Use the Sliding Window technique with left and right pointers.',
+      'Use a HashSet to store visited characters in the current window.'
+    ],
+    testCases: [
+      { input: 's = "abcabcbb"', expected: '3' },
+      { input: 's = "bbbbb"', expected: '1' },
+      { input: 's = "pwwkew"', expected: '3' }
+    ]
+  },
+  {
+    id: 'code_7',
+    number: 322,
+    title: 'Coin Change',
+    difficulty: 'Medium',
+    category: 'Dynamic Programming',
+    acceptance: '44.8%',
+    description: 'You are given an integer array coins representing coins of different denominations and an integer amount representing a total amount of money. Return the fewest number of coins that you need to make up that amount. If that amount of money cannot be made up by any combination of the coins, return -1.',
+    constraints: [
+      '1 <= coins.length <= 12',
+      '1 <= coins[i] <= 2^31 - 1',
+      '0 <= amount <= 10^4'
+    ],
+    starterCode: {
+      python: `def coinChange(coins, amount):\n    dp = [float('inf')] * (amount + 1)\n    dp[0] = 0\n    for a in range(1, amount + 1):\n        for c in coins:\n            if a - c >= 0:\n                dp[a] = min(dp[a], 1 + dp[a - c])\n    return dp[amount] if dp[amount] != float('inf') else -1`,
+      javascript: `function coinChange(coins, amount) {\n    const dp = new Array(amount + 1).fill(Infinity);\n    dp[0] = 0;\n    for (let a = 1; a <= amount; a++) {\n        for (const c of coins) {\n            if (a - c >= 0) {\n                dp[a] = Math.min(dp[a], 1 + dp[a - c]);\n            }\n        }\n    }\n    return dp[amount] !== Infinity ? dp[amount] : -1;\n}`,
+      java: `public int coinChange(int[] coins, int amount) {\n    int[] dp = new int[amount + 1];\n    Arrays.fill(dp, amount + 1);\n    dp[0] = 0;\n    for (int a = 1; a <= amount; a++) {\n        for (int c : coins) {\n            if (a - c >= 0) dp[a] = Math.min(dp[a], 1 + dp[a - c]);\n        }\n    }\n    return dp[amount] > amount ? -1 : dp[amount];\n}`
+    },
+    hints: [
+      'This is an unbounded knapsack problem. Think bottom-up DP.',
+      'dp[i] represents the minimum coins needed to make amount i.'
+    ],
+    testCases: [
+      { input: 'coins = [1,2,5], amount = 11', expected: '3' },
+      { input: 'coins = [2], amount = 3', expected: '-1' },
+      { input: 'coins = [1], amount = 0', expected: '0' }
+    ]
+  },
+  {
+    id: 'code_8',
+    number: 56,
+    title: 'Merge Intervals',
+    difficulty: 'Medium',
+    category: 'Intervals & Sorting',
+    acceptance: '47.5%',
+    description: 'Given an array of intervals where intervals[i] = [starti, endi], merge all overlapping intervals, and return an array of the non-overlapping intervals that cover all the intervals in the input.',
+    constraints: [
+      '1 <= intervals.length <= 10^4',
+      'intervals[i].length == 2',
+      '0 <= starti <= endi <= 10^4'
+    ],
+    starterCode: {
+      python: `def merge(intervals):\n    intervals.sort(key=lambda x: x[0])\n    merged = [intervals[0]]\n    for current in intervals[1:]:\n        prev = merged[-1]\n        if current[0] <= prev[1]:\n            prev[1] = max(prev[1], current[1])\n        else:\n            merged.append(current)\n    return merged`,
+      javascript: `function merge(intervals) {\n    intervals.sort((a, b) => a[0] - b[0]);\n    const res = [intervals[0]];\n    for (let i = 1; i < intervals.length; i++) {\n        const prev = res[res.length - 1];\n        const curr = intervals[i];\n        if (curr[0] <= prev[1]) {\n            prev[1] = Math.max(prev[1], curr[1]);\n        } else {\n            res.push(curr);\n        }\n    }\n    return res;\n}`,
+      java: `public int[][] merge(int[][] intervals) {\n    Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));\n    List<int[]> res = new ArrayList<>();\n    int[] curr = intervals[0];\n    res.add(curr);\n    for (int[] interval : intervals) {\n        if (interval[0] <= curr[1]) {\n            curr[1] = Math.max(curr[1], interval[1]);\n        } else {\n            curr = interval;\n            res.add(curr);\n        }\n    }\n    return res.toArray(new int[res.size()][]);\n}`
+    },
+    hints: [
+      'Sorting intervals by start time turns the problem into a single pass.',
+      'Overlap exists when curr.start <= prev.end.'
+    ],
+    testCases: [
+      { input: 'intervals = [[1,3],[2,6],[8,10],[15,18]]', expected: '[[1,6],[8,10],[15,18]]' },
+      { input: 'intervals = [[1,4],[4,5]]', expected: '[[1,5]]' }
+    ]
+  },
+  {
+    id: 'code_9',
+    number: 215,
+    title: 'Kth Largest Element in an Array',
+    difficulty: 'Medium',
+    category: 'Heap & Quickselect',
+    acceptance: '67.2%',
+    description: 'Given an integer array nums and an integer k, return the kth largest element in the array. Can you solve it in O(n) average time complexity without sorting the entire array?',
+    constraints: [
+      '1 <= k <= nums.length <= 10^5',
+      '-10^4 <= nums[i] <= 10^4'
+    ],
+    starterCode: {
+      python: `import heapq\ndef findKthLargest(nums, k):\n    # Min-heap of size k -> O(n log k)\n    return heapq.nlargest(k, nums)[-1]`,
+      javascript: `function findKthLargest(nums, k) {\n    nums.sort((a, b) => b - a);\n    return nums[k - 1];\n}`,
+      java: `public int findKthLargest(int[] nums, int k) {\n    PriorityQueue<Integer> minHeap = new PriorityQueue<>();\n    for (int n : nums) {\n        minHeap.offer(n);\n        if (minHeap.size() > k) minHeap.poll();\n    }\n    return minHeap.peek();\n}`
+    },
+    hints: [
+      'A Min-Heap of size k keeps the k largest elements.',
+      'Alternatively, Quickselect gives O(n) average runtime.'
+    ],
+    testCases: [
+      { input: 'nums = [3,2,1,5,6,4], k = 2', expected: '5' },
+      { input: 'nums = [3,2,3,1,2,4,5,5,6], k = 4', expected: '4' }
+    ]
+  },
+  {
+    id: 'code_10',
+    number: 42,
+    title: 'Trapping Rain Water',
+    difficulty: 'Hard',
+    category: 'Two Pointers & Stack',
+    acceptance: '62.4%',
+    description: 'Given n non-negative integers representing an elevation map where the width of each bar is 1, compute how much water it can trap after raining.',
+    constraints: [
+      'n == height.length',
+      '1 <= n <= 2 * 10^4',
+      '0 <= height[i] <= 10^5'
+    ],
+    starterCode: {
+      python: `def trap(height):\n    if not height: return 0\n    l, r = 0, len(height) - 1\n    left_max, right_max = height[l], height[r]\n    water = 0\n    while l < r:\n        if left_max < right_max:\n            l += 1\n            left_max = max(left_max, height[l])\n            water += left_max - height[l]\n        else:\n            r -= 1\n            right_max = max(right_max, height[r])\n            water += right_max - height[r]\n    return water`,
+      javascript: `function trap(height) {\n    let l = 0, r = height.length - 1;\n    let leftMax = 0, rightMax = 0, water = 0;\n    while (l < r) {\n        if (height[l] < height[r]) {\n            if (height[l] >= leftMax) leftMax = height[l];\n            else water += leftMax - height[l];\n            l++;\n        } else {\n            if (height[r] >= rightMax) rightMax = height[r];\n            else water += rightMax - height[r];\n            r--;\n        }\n    }\n    return water;\n}`,
+      java: `public int trap(int[] height) {\n    int l = 0, r = height.length - 1;\n    int leftMax = 0, rightMax = 0, water = 0;\n    while (l < r) {\n        if (height[l] < height[r]) {\n            if (height[l] >= leftMax) leftMax = height[l];\n            else water += leftMax - height[l];\n            l++;\n        } else {\n            if (height[r] >= rightMax) rightMax = height[r];\n            else water += rightMax - height[r];\n            r--;\n        }\n    }\n    return water;\n}`
+    },
+    hints: [
+      'Water trapped above bar i is min(max_left, max_right) - height[i].',
+      'Two pointers moving inward eliminate the need for O(n) auxiliary arrays.'
+    ],
+    testCases: [
+      { input: 'height = [0,1,0,2,1,0,1,3,2,1,2,1]', expected: '6' },
+      { input: 'height = [4,2,0,3,2,5]', expected: '9' }
     ]
   }
 ];
