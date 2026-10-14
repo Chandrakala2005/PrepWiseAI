@@ -67,8 +67,13 @@ export default function Navbar({ streakCount = 7, onStartInterview, user, onLogo
           <span style={{ fontSize: '20px', fontWeight: '800', letterSpacing: '-0.5px' }}>
             PrepWise<span className="gradient-text">AI</span>
           </span>
-          <div className="hide-mobile" style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: '600', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
-            AI Interview Suite
+          <div className="hide-mobile" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: '600', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+              AI Interview Suite
+            </span>
+            <span style={{ fontSize: '9px', padding: '1px 6px', borderRadius: '4px', background: 'rgba(99, 102, 241, 0.25)', color: '#A5B4FC', fontWeight: '700', border: '1px solid rgba(99, 102, 241, 0.4)' }}>
+              🦙 Meta LLaMA 3.1
+            </span>
           </div>
         </div>
       </div>

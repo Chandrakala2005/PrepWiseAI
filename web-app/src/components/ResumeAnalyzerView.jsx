@@ -66,10 +66,15 @@ export default function ResumeAnalyzerView() {
   return (
     <div style={{ maxWidth: '850px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <div>
-        <h2 style={{ fontSize: '24px', fontWeight: '800', marginBottom: '4px' }}>
-          Resume <span className="gradient-text">ATS Skill Gap Analyzer</span>
-        </h2>
-        <p style={{ color: 'var(--text-muted)', fontSize: '13px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px', flexWrap: 'wrap' }}>
+          <h2 style={{ fontSize: '24px', fontWeight: '800', margin: 0 }}>
+            Resume <span className="gradient-text">ATS Skill Gap Analyzer</span>
+          </h2>
+          <span style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '6px', background: 'rgba(99, 102, 241, 0.2)', color: '#A5B4FC', fontWeight: '700', border: '1px solid rgba(99, 102, 241, 0.4)' }}>
+            🦙 Meta LLaMA 3.1
+          </span>
+        </div>
+        <p style={{ color: 'var(--text-muted)', fontSize: '13px', margin: 0 }}>
           Upload your PDF resume to extract skills, calculate ATS score, and benchmark against top tech roles.
         </p>
       </div>

@@ -51,19 +51,34 @@ export default function AnalyticsView({ onStartNewInterview, sessionResult }) {
         alignItems: 'center'
       }}>
         <div>
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '6px',
-            padding: '4px 12px',
-            borderRadius: 'var(--radius-full)',
-            background: 'rgba(16, 185, 129, 0.18)',
-            color: 'var(--accent-emerald)',
-            fontSize: '12px',
-            fontWeight: '700',
-            marginBottom: '10px'
-          }}>
-            <Sparkles size={14} /> Evaluation Completed
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap' }}>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '4px 12px',
+              borderRadius: 'var(--radius-full)',
+              background: 'rgba(16, 185, 129, 0.18)',
+              color: 'var(--accent-emerald)',
+              fontSize: '12px',
+              fontWeight: '700'
+            }}>
+              <Sparkles size={14} /> Evaluation Completed
+            </div>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '4px 12px',
+              borderRadius: 'var(--radius-full)',
+              background: 'rgba(99, 102, 241, 0.2)',
+              color: '#A5B4FC',
+              fontSize: '12px',
+              fontWeight: '700',
+              border: '1px solid rgba(99, 102, 241, 0.35)'
+            }}>
+              🦙 Meta LLaMA 3.1 Engine
+            </div>
           </div>
           <h2 style={{ fontSize: '24px', fontWeight: '800' }}>AI Performance Report & Critique</h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginTop: '4px' }}>
@@ -217,6 +232,41 @@ export default function AnalyticsView({ onStartNewInterview, sessionResult }) {
                 </ul>
               </div>
             )}
+          </div>
+        </div>
+      </div>
+
+      {/* LLaMA Model Verification & Architecture Card */}
+      <div className="glass-panel" style={{ padding: '22px', border: '1px solid rgba(99, 102, 241, 0.35)', background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.8) 0%, rgba(10, 15, 29, 0.9) 100%)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '24px' }}>🦙</span>
+            <div>
+              <div style={{ fontSize: '15px', fontWeight: '800' }}>Meta LLaMA 3.1 Inference Engine Verified</div>
+              <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Architecture, Model Parameters & Evaluation Pipeline Specifications</div>
+            </div>
+          </div>
+          <span style={{ fontSize: '11px', padding: '4px 12px', borderRadius: 'var(--radius-full)', background: 'rgba(16, 185, 129, 0.15)', color: 'var(--accent-emerald)', fontWeight: '700', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+            ● Active In Production
+          </span>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+          <div style={{ padding: '12px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '700' }}>Underlying Model</div>
+            <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-main)', marginTop: '4px' }}>Meta LLaMA 3.1 (8B Instruct)</div>
+          </div>
+          <div style={{ padding: '12px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '700' }}>Context Window</div>
+            <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--accent-teal)', marginTop: '4px' }}>128,000 Tokens</div>
+          </div>
+          <div style={{ padding: '12px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '700' }}>Inference Pipeline</div>
+            <div style={{ fontSize: '13px', fontWeight: '700', color: '#818CF8', marginTop: '4px' }}>Serverless REST (/api/ai)</div>
+          </div>
+          <div style={{ padding: '12px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '700' }}>Output Schema</div>
+            <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--accent-amber)', marginTop: '4px' }}>Strict JSON Assessment</div>
           </div>
         </div>
       </div>
